@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

@@ -2,6 +2,7 @@
 
 package com.example.myapplication
 
+import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,16 +12,26 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.draw.clip
-
+import androidx.compose.ui.viewinterop.AndroidView
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.Style
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun WorkoutDetailScreen() {
+fun WorkoutDetailScreen(entry: WorkoutEntry) {
+    val context = LocalContext.current
+    val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(entry.startTime))
+    val routePoints = entry.route.map { LatLng(it.latitude, it.longitude) }
+
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color.Black) {
@@ -63,7 +74,7 @@ fun WorkoutDetailScreen() {
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Workout on 2025-04-15", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Workout on $formattedDate", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
             Icon(
                 imageVector = Icons.Default.DirectionsRun,
@@ -72,38 +83,61 @@ fun WorkoutDetailScreen() {
                 tint = Color.Black
             )
 
-            // Info Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                WorkoutInfoCard("Duration", "00:45:00")
-                WorkoutInfoCard("Distance (km)", "6.20")
+                val durationMin = (entry.duration / 60).toInt()
+                val durationStr = String.format("%02d:%02d:%02d", durationMin / 60, durationMin % 60, (entry.duration % 60))
+                WorkoutInfoCard("Duration", durationStr)
+                WorkoutInfoCard("Distance (km)", "%.2f".format(entry.distance))
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                WorkoutInfoCard("Elevation Gain", "85 m")
-                WorkoutInfoCard("Calories", "420 kcal")
+                WorkoutInfoCard("Elevation Gain", "-- m")
+                WorkoutInfoCard("Calories", "${entry.calories} kcal")
             }
 
             Divider()
 
-            // Route preview
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFE0E0E0)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Workout route preview here", color = Color.Gray)
+            if (routePoints.isNotEmpty()) {
+                AndroidView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    factory = { ctx ->
+                        MapView(ctx).apply {
+                            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                            getMapAsync { mapboxMap ->
+                                mapboxMap.setStyle(Style.MAPBOX_STREETS) {
+                                    mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0))
+                                    val polyline = com.mapbox.mapboxsdk.annotations.PolylineOptions()
+                                        .addAll(routePoints)
+                                        .color(0xFF3F51B5.toInt())
+                                        .width(5f)
+                                    mapboxMap.addPolyline(polyline)
+                                }
+                            }
+                        }
+                    }
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFE0E0E0)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No route data", color = Color.Gray)
+                }
             }
 
-            // Rating
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
                 repeat(4) {
@@ -134,10 +168,4 @@ fun WorkoutInfoCard(title: String, value: String) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(title, fontSize = 12.sp)
     }
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewWorkoutDetailScreen() {
-    WorkoutDetailScreen()
 }

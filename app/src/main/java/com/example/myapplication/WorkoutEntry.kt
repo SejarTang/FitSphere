@@ -12,5 +12,5 @@ data class WorkoutEntry(
     val duration: Long,
     val distance: Float, // in km
     val calories: Int,
-    val route: List<LatLng> // for map visualization
+    val route: List<LatLngEntity> // for map visualization
 )

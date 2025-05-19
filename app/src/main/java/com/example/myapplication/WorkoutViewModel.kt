@@ -17,7 +17,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         duration: Long,
         distance: Float,
         calories: Int,
-        route: List<LatLng>
+        route: List<LatLngEntity>
     ) {
         val workout = WorkoutEntry(
             type = type,
