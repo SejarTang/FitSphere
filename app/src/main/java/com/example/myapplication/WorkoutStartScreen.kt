@@ -1,3 +1,6 @@
+package com.example.myapplication
+
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,15 +12,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartWorkoutScreen(onBack: () -> Unit = {}) {
-    var selectedType by remember { mutableStateOf("Running") }
     val workoutTypes = listOf("Running", "Cycling", "Hiking")
+    var selectedType by remember { mutableStateOf("Running") }
+
+    val viewModel: WorkoutViewModel = viewModel()
+    var workoutStartTime by remember { mutableStateOf<Long?>(null) }
+    var elapsedTime by remember { mutableStateOf(0L) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // 自动计时
+    if (workoutStartTime != null) {
+        LaunchedEffect(workoutStartTime) {
+            while (true) {
+                elapsedTime = (System.currentTimeMillis() - workoutStartTime!!) / 1000
+                delay(1000)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -103,12 +124,28 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(
-                onClick = { /* Start logic here */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Start", fontSize = 18.sp)
+            if (workoutStartTime == null) {
+                Button(
+                    onClick = {
+                        workoutStartTime = System.currentTimeMillis()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Start", fontSize = 18.sp)
+                }
+            } else {
+                Button(
+                    onClick = {
+                        viewModel.saveWorkout(selectedType, workoutStartTime!!, elapsedTime)
+                        workoutStartTime = null
+                        elapsedTime = 0L
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Finish (${elapsedTime}s)", fontSize = 18.sp)
+                }
             }
         }
     }
