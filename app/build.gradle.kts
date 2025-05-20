@@ -59,6 +59,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation("com.google.code.gson:gson:2.10.1")
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("org.maplibre.gl:android-sdk:9.5.0")
 

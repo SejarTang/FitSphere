@@ -15,9 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.myapplication.LatLngEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,9 +28,18 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
     var selectedType by remember { mutableStateOf("Running") }
 
     val viewModel: WorkoutViewModel = viewModel()
+    val context = LocalContext.current
+    val locationService = remember { LocationService(context) }
+
     var workoutStartTime by remember { mutableStateOf<Long?>(null) }
     var elapsedTime by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
+
+    // 启动 GPS 更新
+    LaunchedEffect(Unit) {
+        locationService.reset()
+        locationService.startLocationUpdates()
+    }
 
     // 自动计时
     if (workoutStartTime != null) {
@@ -137,7 +148,22 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
             } else {
                 Button(
                     onClick = {
-                        viewModel.saveWorkout(selectedType, workoutStartTime!!, elapsedTime)
+                        val totalDistanceMeters = locationService.calculateTotalDistance()
+                        val distanceKm = totalDistanceMeters / 1000f
+                        val calories = (distanceKm * 60).toInt()
+                        val route = locationService.getRoute().map {
+                            LatLngEntity(it.latitude, it.longitude)
+                        }
+
+                        viewModel.saveWorkout(
+                            type = selectedType,
+                            startTime = workoutStartTime!!,
+                            duration = elapsedTime,
+                            distance = distanceKm,
+                            calories = calories,
+                            route = route
+                        )
+
                         workoutStartTime = null
                         elapsedTime = 0L
                     },

@@ -113,7 +113,7 @@ fun WorkoutDetailScreen(entry: WorkoutEntry) {
                         MapView(ctx).apply {
                             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                             getMapAsync { mapboxMap ->
-                                mapboxMap.setStyle(Style.MAPBOX_STREETS) {
+                                mapboxMap.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) { style ->
                                     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0))
                                     val polyline = com.mapbox.mapboxsdk.annotations.PolylineOptions()
                                         .addAll(routePoints)

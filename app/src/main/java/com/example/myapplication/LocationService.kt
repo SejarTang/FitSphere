@@ -44,6 +44,10 @@ class LocationService(context: Context) {
         isStarted = false
     }
 
+    fun getRoute(): List<Location> {
+        return locationList
+    }
+
     fun reset() {
         _locationList.clear()
     }
