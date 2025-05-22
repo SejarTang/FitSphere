@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "870270970713",
-    "project_id": "fitsphere-c8906",
-    "storage_bucket": "fitsphere-c8906.firebasestorage.app"
+    "project_number": "620727711916",
+    "project_id": "myapplication-4d136",
+    "storage_bucket": "myapplication-4d136.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:870270970713:android:f5a00b48e317fc7b15fa48",
+        "mobilesdk_app_id": "1:620727711916:android:62e6217fb4b5c95e4c8709",
         "android_client_info": {
           "package_name": "com.example.myapplication"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "620727711916-otr05sieedq95t7mg5c03724492tis46.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapplication",
+            "certificate_hash": "8fefec19eb0daa52b82c3fbcc9ffe7135ca793c2"
+          }
+        },
+        {
+          "client_id": "620727711916-sng865hss8vm3vctdlouh89b5oo0n6qi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAUF5p6mLFSPC5j5xKfsx0IaFGNYGXlIW4"
+          "current_key": "AIzaSyDS2CWCYFEtJj5GyEpu0vmR3BTCEjBmXls"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620727711916-sng865hss8vm3vctdlouh89b5oo0n6qi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

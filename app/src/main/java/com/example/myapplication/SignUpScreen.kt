@@ -2,6 +2,7 @@
 
 package com.example.myapplication
 
+import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +17,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(
@@ -25,13 +30,14 @@ fun SignUpScreen(
 ) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
-
+    val coroutineScope = rememberCoroutineScope()
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var loading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val firestore = FirebaseFirestore.getInstance()
 
     Column(
         modifier = Modifier
@@ -76,17 +82,32 @@ fun SignUpScreen(
             onClick = {
                 loading = true
                 errorMessage = null
-
-                auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        loading = false
-                        if (task.isSuccessful) {
-                            Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
-                            onSuccess()
-                        } else {
-                            errorMessage = task.exception?.message ?: "Registration failed"
-                        }
+//                auth.createUserWithEmailAndPassword(email, password)
+//                    .addOnCompleteListener { task ->
+//                        loading = false
+//                        if (task.isSuccessful) {
+//                            Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+//                            onSuccess()
+//                        } else {
+//                            errorMessage = task.exception?.message ?: "Registration failed"
+//                        }
+//                    }
+                val user = mapOf(
+                    "name" to name,
+                    "email" to email,
+                    "password" to password
+                )
+                coroutineScope.launch(Dispatchers.IO) {
+                    firestore.collection("Users").document(email).set(
+                        user
+                    ).addOnFailureListener {
+                        println("Registration Successful")
+                        Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        println("Registration Fail")
+                        Toast.makeText(context, "Registration Fail", Toast.LENGTH_SHORT).show()
                     }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = !loading
