@@ -12,9 +12,11 @@ class MainActivity : ComponentActivity() {
         DatabaseProvider.initDatabase(applicationContext)
         setContent {
             MyApplicationTheme {
+//                val navController = rememberNavController()
+//                AppNavGraph(navController = navController)
                 // Set the content to DietScreen or Navigation host
-                DietScreen()  // 如果你只想先调试 Diet 页面
-                // AppNavigation() // 如果你已经设置完整导航结构了
+                DietScreen()
+                // AppNavigation()
             }
         }
     }

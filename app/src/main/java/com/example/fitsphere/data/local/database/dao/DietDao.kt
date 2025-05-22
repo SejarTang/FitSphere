@@ -10,4 +10,8 @@ interface DietDao {
 
     @Query("SELECT * FROM diet_records ORDER BY timestamp DESC")
     suspend fun getAllDiet(): List<DietEntity>
+
+    @Delete
+    suspend fun deleteDiet(diet: DietEntity)
+
 }

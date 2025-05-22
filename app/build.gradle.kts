@@ -72,6 +72,7 @@ dependencies {
     // Nav
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room
     implementation("androidx.room:room-runtime:2.7.1")

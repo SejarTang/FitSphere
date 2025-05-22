@@ -4,6 +4,7 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,17 +30,22 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.repository.DietRepository
 import com.example.myapplication.di.DatabaseProvider
 import com.example.myapplication.ui.diet.DietViewModel
+import com.example.myapplication.data.local.database.entity.DietEntity
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 
 @Composable
 fun DietScreen() {
     val context = LocalContext.current
-
-    // DatabaseProvider
     val dietDao = remember { DatabaseProvider.getDietDao() }
     val repository = remember { DietRepository(dietDao) }
     val viewModel = remember { DietViewModel(repository) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadHistory()
+    }
 
     Scaffold(
         topBar = {
@@ -77,8 +83,6 @@ fun DietScreen() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            //Text("Loaded DietScreen", color = Color.Red, fontSize = 24.sp) //for test
-
             SectionWithBackground(
                 title = "Today's Diet Tip",
                 content = "Eat a balanced breakfast rich in protein and fiber to start your day right."
@@ -87,9 +91,14 @@ fun DietScreen() {
             DietTrackerSection(viewModel)
 
             Text("Healthy Recipes", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            RecipeGrid(context)
+            RecipeGrid(LocalContext.current)
 
-            Spacer(modifier = Modifier.height(80.dp))
+            // Record list
+            if (viewModel.dietHistory.isNotEmpty()) {
+                Text("Saved Records", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                SavedRecordsList(viewModel)
+            }
+
         }
     }
 }
@@ -120,10 +129,7 @@ fun RecipeGrid(context: android.content.Context) {
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         for (row in items.chunked(2)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 row.forEach { item ->
                     Box(
                         modifier = Modifier
@@ -170,6 +176,7 @@ fun DietTrackerSection(viewModel: DietViewModel) {
     val breakfast = viewModel.breakfast
     val lunch = viewModel.lunch
     val dinner = viewModel.dinner
+    val context = LocalContext.current
 
     val foodOptions = listOf("Chicken Breast", "Brown Rice", "Salad", "Oats", "Smoothie")
     var expanded by remember { mutableStateOf(false) }
@@ -199,7 +206,7 @@ fun DietTrackerSection(viewModel: DietViewModel) {
                     DropdownMenuItem(
                         text = { Text(food) },
                         onClick = {
-                            viewModel.selectedFood.value = food
+                            selectedFood.value = food
                             expanded = false
                         }
                     )
@@ -208,34 +215,87 @@ fun DietTrackerSection(viewModel: DietViewModel) {
         }
 
         Text("Calories: ${calories.value.toInt()} kcal")
-        Slider(
-            value = calories.value,
-            onValueChange = { viewModel.calories.value = it },
-            valueRange = 0f..1000f,
-            steps = 9
-        )
+        Slider(value = calories.value, onValueChange = { calories.value = it }, valueRange = 0f..1000f, steps = 9)
 
         Divider()
 
         Text("Today's Meal Checklist", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = breakfast.value, onCheckedChange = { viewModel.breakfast.value = it })
+            Checkbox(checked = breakfast.value, onCheckedChange = { breakfast.value = it })
             Text("Breakfast")
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = lunch.value, onCheckedChange = { viewModel.lunch.value = it })
+            Checkbox(checked = lunch.value, onCheckedChange = { lunch.value = it })
             Text("Lunch")
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = dinner.value, onCheckedChange = { viewModel.dinner.value = it })
+            Checkbox(checked = dinner.value, onCheckedChange = { dinner.value = it })
             Text("Dinner")
         }
 
-        Button(onClick = { viewModel.saveDiet() }, modifier = Modifier.align(Alignment.End)) {
+        Button(onClick = {
+            viewModel.saveDiet()
+            Toast.makeText(context, "Saved successfully!", Toast.LENGTH_SHORT).show()
+        }, modifier = Modifier.align(Alignment.End)) {
             Text("Save")
         }
     }
 }
+
+@Composable
+fun SavedRecordsList(viewModel: DietViewModel) {
+    // Load history when composable is shown
+    LaunchedEffect(Unit) {
+        viewModel.loadHistory()
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        for (record in viewModel.dietHistory) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F7))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "${record.foodName} - ${record.calories} kcal",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black
+                        )
+                        val formattedTime = remember(record.timestamp) {
+                            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
+                                .format(java.util.Date(record.timestamp))
+                        }
+                        Text(text = formattedTime, fontSize = 12.sp, color = Color.Gray)
+
+                        val tags = listOfNotNull(
+                            if (record.isBreakfast) "Breakfast" else null,
+                            if (record.isLunch) "Lunch" else null,
+                            if (record.isDinner) "Dinner" else null
+                        )
+                        if (tags.isNotEmpty()) {
+                            Text(text = "Meal: ${tags.joinToString()}", fontSize = 13.sp, color = Color.DarkGray)
+                        }
+                    }
+
+                    // Delete icon button
+                    IconButton(onClick = { viewModel.deleteDiet(record) }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

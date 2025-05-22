@@ -12,4 +12,7 @@ class DietRepository(private val dietDao: DietDao) {
     suspend fun getDietHistory(): List<DietEntity> {
         return dietDao.getAllDiet()
     }
+
+    suspend fun deleteDietRecord(record: DietEntity) = dietDao.deleteDiet(record)
+
 }

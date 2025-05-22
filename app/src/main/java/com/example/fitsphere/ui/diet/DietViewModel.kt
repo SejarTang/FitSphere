@@ -11,23 +11,16 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for managing diet input and history, without Hilt.
  */
-class DietViewModel(
-    private val repository: DietRepository
-) : ViewModel() {
+class DietViewModel(private val repository: DietRepository) : ViewModel() {
+    val selectedFood = mutableStateOf("Select food")
+    val calories = mutableStateOf(300f)
+    val breakfast = mutableStateOf(false)
+    val lunch = mutableStateOf(false)
+    val dinner = mutableStateOf(false)
 
-    // UI state for user input
-    var selectedFood = mutableStateOf("Select food")
-    var calories = mutableStateOf(300f)
-    var breakfast = mutableStateOf(false)
-    var lunch = mutableStateOf(false)
-    var dinner = mutableStateOf(false)
-
-    // List to hold diet history records for display
     val dietHistory = mutableStateListOf<DietEntity>()
+    val showSavedMessage = mutableStateOf(false)
 
-    /**
-     * Save the current diet input to the database
-     */
     fun saveDiet() {
         val entity = DietEntity(
             foodName = selectedFood.value,
@@ -36,15 +29,21 @@ class DietViewModel(
             isLunch = lunch.value,
             isDinner = dinner.value
         )
+
         viewModelScope.launch {
             repository.saveDietRecord(entity)
-            loadHistory() // Refresh history after saving
+            loadHistory()
+            showSavedMessage.value = true
         }
     }
 
-    /**
-     * Load diet records from the database into dietHistory list
-     */
+    fun deleteDiet(record: DietEntity) {
+        viewModelScope.launch {
+            repository.deleteDietRecord(record)
+            loadHistory()
+        }
+    }
+
     fun loadHistory() {
         viewModelScope.launch {
             val result = repository.getDietHistory()
@@ -53,3 +52,4 @@ class DietViewModel(
         }
     }
 }
+
