@@ -12,8 +12,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: WorkoutViewModel = viewModel()
-            WorkoutNavHost(viewModel = viewModel)
+           // val viewModel: WorkoutViewModel = viewModel()
+            //WorkoutNavHost(ViewModel = viewModel)
         }
     }
 }

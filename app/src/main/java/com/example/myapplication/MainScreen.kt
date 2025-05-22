@@ -22,14 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.zIndex
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.R
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
-    val context = LocalContext.current
-
+fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,21 +48,21 @@ fun HomeScreen() {
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = {},
+                    onClick = { navController.navigate("workout/cardio") },
                     icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
                     label = { Text("Workout", color = Color.White) },
                     alwaysShowLabel = true
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = {},
+                    onClick = { navController.navigate("diet") },
                     icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
                     label = { Text("Diet", color = Color.White) },
                     alwaysShowLabel = true
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = {},
+                    onClick = { navController.navigate("profile") },
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
                     label = { Text("Profile", color = Color.White) },
                     alwaysShowLabel = true
@@ -84,7 +84,7 @@ fun HomeScreen() {
             SectionWithBackground(title = "Fitness Tips", content = "Remember to warm up before your workout and stay hydrated throughout your training.")
 
             Text("Explore Workouts", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            WorkoutGrid(context = context)
+            WorkoutGrid(navController = navController)
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
@@ -106,12 +106,12 @@ fun SectionWithBackground(title: String, content: String) {
 }
 
 @Composable
-fun WorkoutGrid(context: android.content.Context) {
+fun WorkoutGrid(navController: NavController) {
     val items = listOf(
-        GridItem("Cardio", R.drawable.cardio, "https://www.youtube.com/results?search_query=cardio+workout"),
-        GridItem("Yoga", R.drawable.yoga, "https://www.youtube.com/results?search_query=yoga+routine"),
-        GridItem("HIIT", R.drawable.hiit, "https://www.youtube.com/results?search_query=hiit+workout"),
-        GridItem("Stretching", R.drawable.stretching, "https://www.youtube.com/results?search_query=stretching+exercise")
+        GridItem("Cardio", R.drawable.cardio, "cardio"),
+        GridItem("Yoga", R.drawable.yoga, "yoga"),
+        GridItem("HIIT", R.drawable.hiit, "hiit"),
+        GridItem("Strength", R.drawable.stretching, "strength")
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -124,8 +124,7 @@ fun WorkoutGrid(context: android.content.Context) {
                             .clip(RoundedCornerShape(12.dp))
                             .background(Color(0xFFE0E0E0))
                             .clickable {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.link))
-                                context.startActivity(intent)
+                                navController.navigate("workout/${item.link}")
                             }
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
@@ -158,8 +157,12 @@ fun WorkoutGrid(context: android.content.Context) {
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 
+
 @Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen() {
-    HomeScreen()
+fun HomeScreenPreview() {
+    MaterialTheme {
+        val navController = rememberNavController()
+        HomeScreen(navController = navController)
+    }
 }
