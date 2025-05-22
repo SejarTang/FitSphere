@@ -62,7 +62,9 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("org.maplibre.gl:android-sdk:9.5.0")
-
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
     // Room dependencies
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
