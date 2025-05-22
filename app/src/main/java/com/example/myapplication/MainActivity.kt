@@ -3,15 +3,17 @@ package com.example.myapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.workout.WorkoutNavHost
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // enableEdgeToEdge() 相关代码已移除
-
         setContent {
-            DietScreen()
+            val viewModel: WorkoutViewModel = viewModel()
+            WorkoutNavHost(viewModel = viewModel)
         }
     }
 }

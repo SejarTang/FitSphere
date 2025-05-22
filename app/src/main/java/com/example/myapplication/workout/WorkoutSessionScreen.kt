@@ -1,8 +1,9 @@
-package com.example.myapplication
+package com.example.myapplication.workout
 
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,26 +18,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import com.example.myapplication.LatLngEntity
+import com.example.myapplication.WorkoutViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkoutSessionScreen(onBack: () -> Unit = {}) {
+fun WorkoutSessionScreen(
+    onBack: () -> Unit = {},
+    navController: NavController,
+    viewModel: WorkoutViewModel
+) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
+    val coroutineScope = rememberCoroutineScope()
     val locationService = remember { LocationService(context) }
+    val startTime = remember { System.currentTimeMillis() }
 
-    // 权限请求
     LaunchedEffect(Unit) {
-        if (
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
@@ -73,8 +79,8 @@ fun WorkoutSessionScreen(onBack: () -> Unit = {}) {
 
     val totalDistanceMeters = locationService.calculateTotalDistance()
     val distanceKm = totalDistanceMeters / 1000f
-    val elevationGain = (elapsedSeconds / 30) * 2 // 每 30 秒增加 2 米
-    val calories = (distanceKm * 60).toInt() // 每公里消耗 60 千卡
+    val elevationGain = (elapsedSeconds / 30) * 2
+    val calories = (distanceKm * 60).toInt()
 
     val formattedTime = String.format(
         "%02d:%02d:%02d",
@@ -97,18 +103,10 @@ fun WorkoutSessionScreen(onBack: () -> Unit = {}) {
         },
         bottomBar = {
             NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(selected = true, onClick = {}, icon = {
-                    Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White)
-                }, label = { Text("Workout", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White)
-                }, label = { Text("Home", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White)
-                }, label = { Text("Diet", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
-                }, label = { Text("Profile", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(true, onClick = {}, icon = { Icon(Icons.Default.DirectionsWalk, null, tint = Color.White) }, label = { Text("Workout", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Home, null, tint = Color.White) }, label = { Text("Home", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Coffee, null, tint = Color.White) }, label = { Text("Diet", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Person, null, tint = Color.White) }, label = { Text("Profile", color = Color.White) }, alwaysShowLabel = true)
             }
         },
         containerColor = Color.White
@@ -128,16 +126,34 @@ fun WorkoutSessionScreen(onBack: () -> Unit = {}) {
                 tint = Color.Black
             )
 
-            StatItem(title = "Duration", value = formattedTime)
-            StatItem(title = "Distance (km)", value = String.format("%.2f", distanceKm))
-            StatItem(title = "Elevation Gain (m)", value = "$elevationGain m")
-            StatItem(title = "Estimated Calories Burned", value = "$calories kcal")
+            StatItem("Duration", formattedTime)
+            StatItem("Distance (km)", String.format("%.2f", distanceKm))
+            StatItem("Elevation Gain (m)", "$elevationGain m")
+            StatItem("Estimated Calories Burned", "$calories kcal")
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    // End workout 逻辑预留：可以保存数据到数据库
+                    locationService.stopLocationUpdates()
+                    val route = locationService.getRoute().map {
+                        LatLngEntity(it.latitude, it.longitude)
+                    }
+
+                    coroutineScope.launch {
+                        val workout = viewModel.saveWorkout(
+                            type = "Running",
+                            startTime = startTime,
+                            duration = elapsedSeconds,
+                            distance = distanceKm,
+                            calories = calories,
+                            route = route
+                        )
+
+                        Log.d("Workout", "Saved workout with ID=${workout.id}, startTime=${workout.startTime}")
+
+                        navController.navigate("detail/${workout.id}")
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
                 modifier = Modifier.fillMaxWidth()

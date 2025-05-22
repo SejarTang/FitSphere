@@ -5,6 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.myapplication.dao.WorkoutDao
+import com.example.myapplication.Converters
+import com.example.myapplication.workout.WorkoutEntry
 
 @Database(entities = [WorkoutEntry::class], version = 1)
 @TypeConverters(Converters::class)

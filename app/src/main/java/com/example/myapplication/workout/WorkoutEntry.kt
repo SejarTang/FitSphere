@@ -1,8 +1,8 @@
-package com.example.myapplication
+package com.example.myapplication.workout
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.android.gms.maps.model.LatLng
+import com.example.myapplication.LatLngEntity
 
 @Entity(tableName = "workouts")
 data class WorkoutEntry(
