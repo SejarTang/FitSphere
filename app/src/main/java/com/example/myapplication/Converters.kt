@@ -6,13 +6,15 @@ import com.google.gson.reflect.TypeToken
 
 class Converters {
     @TypeConverter
-    fun fromLatLngList(value: List<LatLngEntity>): String {
+    fun fromLatLngList(value: ArrayList<LatLngEntity>): String {
         return Gson().toJson(value)
     }
 
+
     @TypeConverter
-    fun toLatLngList(value: String): List<LatLngEntity> {
+    fun toLatLngList(value: String): ArrayList<LatLngEntity> {
         val listType = object : TypeToken<List<LatLngEntity>>() {}.type
-        return Gson().fromJson(value, listType)
+        return Gson().fromJson<List<LatLngEntity>>(value, listType) as ArrayList<LatLngEntity>
     }
+
 }

@@ -136,9 +136,11 @@ fun WorkoutSessionScreen(
             Button(
                 onClick = {
                     locationService.stopLocationUpdates()
-                    val route = locationService.getRoute().map {
+
+                    // ✅ 将 route 转换为 ArrayList<LatLngEntity>（Parcelable-safe）
+                    val route = ArrayList(locationService.getRoute().map {
                         LatLngEntity(it.latitude, it.longitude)
-                    }
+                    })
 
                     coroutineScope.launch {
                         val workout = viewModel.saveWorkout(
@@ -150,16 +152,27 @@ fun WorkoutSessionScreen(
                             route = route
                         )
 
-                        Log.d("Workout", "Saved workout with ID=${workout.id}, startTime=${workout.startTime}")
+                        // ✅ 缓存一次（非必要，但你项目里用到）
+                        viewModel.cacheWorkout(workout)
 
-                        navController.navigate("detail/${workout.id}")
+                        // ✅ 通过 savedStateHandle 传递 Parcelable 对象
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("workoutEntry", workout)
+
+                        // ✅ 跳转到 detail 页面（不再传 id）
+                        navController.navigate("detail")
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("End Workout", fontSize = 18.sp)
             }
+
         }
     }
 }
