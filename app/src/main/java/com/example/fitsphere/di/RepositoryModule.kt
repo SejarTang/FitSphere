@@ -1,20 +1,20 @@
 package com.example.myapplication.di
 
-import com.example.myapplication.data.local.database.dao.DietDao
 import com.example.myapplication.data.repository.DietRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object RepositoryModule {
+object RepositoryProvider {
 
-    @Provides
-    @Singleton
-    fun provideDietRepository(dietDao: DietDao): DietRepository {
-        return DietRepository(dietDao)
+    private var dietRepository: DietRepository? = null
+
+    fun initRepository() {
+        if (dietRepository == null) {
+            val dietDao = DatabaseProvider.getDietDao()
+            dietRepository = DietRepository(dietDao)
+        }
+    }
+
+    fun getDietRepository(): DietRepository {
+        return dietRepository
+            ?: throw IllegalStateException("Repository not initialized. Call initRepository() first.")
     }
 }

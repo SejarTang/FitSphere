@@ -4,29 +4,28 @@ import android.content.Context
 import androidx.room.Room
 import com.example.myapplication.data.local.database.FitSphereDatabase
 import com.example.myapplication.data.local.database.dao.DietDao
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DatabaseModule {
+object DatabaseProvider {
 
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): FitSphereDatabase {
-        return Room.databaseBuilder(
-            context,
-            FitSphereDatabase::class.java,
-            "fitsphere_db"
-        ).build()
+    private var databaseInstance: FitSphereDatabase? = null
+
+    fun initDatabase(context: Context) {
+        if (databaseInstance == null) {
+            databaseInstance = Room.databaseBuilder(
+                context.applicationContext,
+                FitSphereDatabase::class.java,
+                "fitsphere_db"
+            ).build()
+        }
     }
 
-    @Provides
-    fun provideDietDao(database: FitSphereDatabase): DietDao {
-        return database.dietDao()
+    fun getDatabase(): FitSphereDatabase {
+        return databaseInstance
+            ?: throw IllegalStateException("Database is not initialized. Call initDatabase(context) first.")
+    }
+
+    // 获取 DietDao
+    fun getDietDao(): DietDao {
+        return getDatabase().dietDao()
     }
 }

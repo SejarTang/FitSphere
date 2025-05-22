@@ -26,12 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.data.repository.DietRepository
+import com.example.myapplication.di.DatabaseProvider
+import com.example.myapplication.ui.diet.DietViewModel
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 
 @Composable
 fun DietScreen() {
     val context = LocalContext.current
+
+    // DatabaseProvider
+    val dietDao = remember { DatabaseProvider.getDietDao() }
+    val repository = remember { DietRepository(dietDao) }
+    val viewModel = remember { DietViewModel(repository) }
 
     Scaffold(
         topBar = {
@@ -42,34 +50,21 @@ fun DietScreen() {
         },
         bottomBar = {
             NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
+                NavigationBarItem(selected = false, onClick = {}, icon = {
+                    Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White)
+                }, label = { Text("Home", color = Color.White) })
+
+                NavigationBarItem(selected = false, onClick = {}, icon = {
+                    Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White)
+                }, label = { Text("Workout", color = Color.White) })
+
+                NavigationBarItem(selected = true, onClick = {}, icon = {
+                    Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White)
+                }, label = { Text("Diet", color = Color.White) })
+
+                NavigationBarItem(selected = false, onClick = {}, icon = {
+                    Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
+                }, label = { Text("Profile", color = Color.White) })
             }
         },
         containerColor = Color.White
@@ -82,12 +77,14 @@ fun DietScreen() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            //Text("Loaded DietScreen", color = Color.Red, fontSize = 24.sp) //for test
+
             SectionWithBackground(
                 title = "Today's Diet Tip",
                 content = "Eat a balanced breakfast rich in protein and fiber to start your day right."
             )
 
-            DietTrackerSection()
+            DietTrackerSection(viewModel)
 
             Text("Healthy Recipes", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             RecipeGrid(context)
@@ -123,7 +120,10 @@ fun RecipeGrid(context: android.content.Context) {
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         for (row in items.chunked(2)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 row.forEach { item ->
                     Box(
                         modifier = Modifier
@@ -164,7 +164,7 @@ fun RecipeGrid(context: android.content.Context) {
 }
 
 @Composable
-fun DietTrackerSection(viewModel: DietViewModel = hiltViewModel()) {
+fun DietTrackerSection(viewModel: DietViewModel) {
     val selectedFood = viewModel.selectedFood
     val calories = viewModel.calories
     val breakfast = viewModel.breakfast
@@ -184,7 +184,6 @@ fun DietTrackerSection(viewModel: DietViewModel = hiltViewModel()) {
     ) {
         Text("Food Intake Log", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
-        // Dropdown menu
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
             TextField(
                 value = selectedFood.value,
@@ -208,7 +207,6 @@ fun DietTrackerSection(viewModel: DietViewModel = hiltViewModel()) {
             }
         }
 
-        // Calories slider
         Text("Calories: ${calories.value.toInt()} kcal")
         Slider(
             value = calories.value,
@@ -233,11 +231,7 @@ fun DietTrackerSection(viewModel: DietViewModel = hiltViewModel()) {
             Text("Dinner")
         }
 
-        // Save Button
-        Button(
-            onClick = { viewModel.saveDiet() },
-            modifier = Modifier.align(Alignment.End)
-        ) {
+        Button(onClick = { viewModel.saveDiet() }, modifier = Modifier.align(Alignment.End)) {
             Text("Save")
         }
     }
@@ -245,6 +239,6 @@ fun DietTrackerSection(viewModel: DietViewModel = hiltViewModel()) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewDietScreen() {
+fun DietScreenPreview() {
     DietScreen()
 }
