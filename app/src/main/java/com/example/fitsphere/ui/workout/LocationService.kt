@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
 
 import android.annotation.SuppressLint
 import android.content.Context

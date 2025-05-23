@@ -1,7 +1,7 @@
-package com.example.myapplication.repository
+package com.example.fitsphere.repository
 
-import com.example.myapplication.dao.WorkoutDao
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
+import com.example.fitsphere.dao.WorkoutDao
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import kotlinx.coroutines.flow.Flow
 
 class WorkoutRepository(private val workoutDao: WorkoutDao) {

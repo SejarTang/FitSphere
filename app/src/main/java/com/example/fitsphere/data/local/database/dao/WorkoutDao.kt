@@ -1,7 +1,7 @@
-package com.example.myapplication.dao
+package com.example.fitsphere.dao
 
 import androidx.room.*
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

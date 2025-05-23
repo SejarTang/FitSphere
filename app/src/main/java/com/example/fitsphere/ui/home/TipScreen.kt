@@ -1,4 +1,4 @@
-package com.example.myapplication.mainScreenPage
+package com.example.fitsphere.ui.home
 
 import android.content.ClipData
 import android.content.ClipboardManager

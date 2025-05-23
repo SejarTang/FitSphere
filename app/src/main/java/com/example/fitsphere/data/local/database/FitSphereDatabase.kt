@@ -1,15 +1,15 @@
-package com.example.myapplication.data.local.database
+package com.example.fitsphere.data.local.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.myapplication.data.local.database.dao.DietDao
-import com.example.myapplication.dao.WorkoutDao
-import com.example.myapplication.data.local.database.entity.DietEntity
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
-import com.example.myapplication.data.local.database.entity.Converters
+import com.example.fitsphere.dao.WorkoutDao
+import com.example.fitsphere.data.local.database.dao.DietDao
+import com.example.fitsphere.data.local.database.entity.DietEntity
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
+import com.example.fitsphere.data.local.database.entity.Converters
 
 @Database(
     entities = [DietEntity::class, WorkoutEntity::class],

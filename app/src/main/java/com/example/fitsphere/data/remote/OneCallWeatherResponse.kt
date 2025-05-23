@@ -1,4 +1,4 @@
-package com.example.myapplication.api
+package com.example.fitsphere.data.remote
 
 data class OneCallWeatherResponse(
     val current: Current

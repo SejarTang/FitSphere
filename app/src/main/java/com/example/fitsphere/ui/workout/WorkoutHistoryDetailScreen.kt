@@ -43,38 +43,6 @@ fun WorkoutHistoryScreen() {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
-        },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
         }
     ) { innerPadding ->
         Column(
@@ -84,11 +52,11 @@ fun WorkoutHistoryScreen() {
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Upper section: Start Workout Button
+            // Start Workout Button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Button(
@@ -100,7 +68,7 @@ fun WorkoutHistoryScreen() {
                 }
             }
 
-            // Lower section: Workout History
+            // Workout History Title
             Text(
                 text = "Workout History",
                 fontSize = 18.sp,
@@ -109,7 +77,8 @@ fun WorkoutHistoryScreen() {
                 color = Color.Black
             )
 
-            LazyColumn(modifier = Modifier.weight(1f)) {
+            // Workout History List
+            LazyColumn(modifier = Modifier.fillMaxHeight()) {
                 items(workoutHistory) { record ->
                     WorkoutHistoryItem(record)
                 }
@@ -117,6 +86,7 @@ fun WorkoutHistoryScreen() {
         }
     }
 }
+
 
 @Composable
 fun WorkoutHistoryItem(record: WorkoutRecord) {

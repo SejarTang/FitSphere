@@ -1,7 +1,8 @@
-package com.example.myapplication.ui.theme
+package com.example.fitsphere.ui.theme
 
 import android.app.Activity
 import android.os.Build
+
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -52,7 +53,7 @@ fun MyApplicationTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
         content = content
     )
+
 }

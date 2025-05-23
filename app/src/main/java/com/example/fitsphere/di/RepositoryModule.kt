@@ -1,6 +1,6 @@
-package com.example.myapplication.di
+package com.example.fitsphere.di
 
-import com.example.myapplication.data.repository.DietRepository
+import com.example.fitsphere.data.repository.DietRepository
 
 object RepositoryProvider {
 

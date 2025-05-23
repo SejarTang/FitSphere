@@ -1,4 +1,4 @@
-package com.example.myapplication.api
+package com.example.fitsphere.data.remote
 
 
 import retrofit2.http.GET

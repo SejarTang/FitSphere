@@ -1,7 +1,7 @@
-package com.example.myapplication.data.local.database.entity
+package com.example.fitsphere.data.local.database.entity
 
 import androidx.room.TypeConverter
-import com.example.myapplication.data.local.database.entity.LatLngEntity
+import com.example.fitsphere.data.local.database.entity.LatLngEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

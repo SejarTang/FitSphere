@@ -1,9 +1,9 @@
-package com.example.myapplication.di
+package com.example.fitsphere.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.myapplication.data.local.database.FitSphereDatabase
-import com.example.myapplication.data.local.database.dao.DietDao
+import com.example.fitsphere.data.local.database.FitSphereDatabase
+import com.example.fitsphere.data.local.database.dao.DietDao
 
 object DatabaseProvider {
 

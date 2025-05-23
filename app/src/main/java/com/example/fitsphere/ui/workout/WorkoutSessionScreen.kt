@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
 
 import android.Manifest
 import android.app.Activity
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.example.myapplication.data.local.database.entity.LatLngEntity
+import com.example.fitsphere.data.local.database.entity.LatLngEntity
 import com.example.fitsphere.ui.workout.WorkoutViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -100,14 +100,7 @@ fun WorkoutSessionScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(true, onClick = {}, icon = { Icon(Icons.Default.DirectionsWalk, null, tint = Color.White) }, label = { Text("Workout", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Home, null, tint = Color.White) }, label = { Text("Home", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Coffee, null, tint = Color.White) }, label = { Text("Diet", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(false, onClick = {}, icon = { Icon(Icons.Default.Person, null, tint = Color.White) }, label = { Text("Profile", color = Color.White) }, alwaysShowLabel = true)
-            }
-        },
+        // ✅ bottomBar 已删除
         containerColor = Color.White
     ) { innerPadding ->
         Column(
@@ -150,14 +143,11 @@ fun WorkoutSessionScreen(
                             route = route
                         )
 
-
                         viewModel.cacheWorkout(workout)
-
 
                         navController.currentBackStackEntry
                             ?.savedStateHandle
                             ?.set("workoutEntry", workout)
-
 
                         navController.navigate("detail")
                     }
@@ -174,6 +164,7 @@ fun WorkoutSessionScreen(
         }
     }
 }
+
 
 @Composable
 fun StatItem(title: String, value: String) {

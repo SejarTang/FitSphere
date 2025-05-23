@@ -1,8 +1,6 @@
 package com.example.fitsphere.ui.workout
 
 
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
-import com.example.myapplication.ui.workout.WorkoutNavHost
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import com.example.fitsphere.ui.workout.WorkoutViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,7 +33,6 @@ fun WorkoutHomeScreen(
 ) {
     val workoutHistory by viewModel.workoutList.collectAsState()
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -46,39 +44,9 @@ fun WorkoutHomeScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
-        },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
         }
+
+        // ✅ bottomBar 已删除
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -118,6 +86,7 @@ fun WorkoutHomeScreen(
         }
     }
 }
+
 
 @Composable
 fun WorkoutRecordItem(entry: WorkoutEntity, navController: NavController) {

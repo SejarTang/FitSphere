@@ -2,9 +2,6 @@
 
 package com.example.fitsphere.ui.diet
 
-
-
-
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -16,7 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,18 +24,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.repository.DietRepository
-import com.example.myapplication.di.DatabaseProvider
-import com.example.myapplication.ui.diet.DietViewModel
-import com.example.myapplication.data.local.database.entity.DietEntity
+import com.example.fitsphere.R
+import com.example.fitsphere.data.repository.DietRepository
+import com.example.fitsphere.di.DatabaseProvider
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.navigation.NavController
-import com.example.fitsphere.R
-
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 
@@ -60,25 +52,6 @@ fun DietScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White)
-                }, label = { Text("Home", color = Color.White) })
-
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White)
-                }, label = { Text("Workout", color = Color.White) })
-
-                NavigationBarItem(selected = true, onClick = {}, icon = {
-                    Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White)
-                }, label = { Text("Diet", color = Color.White) })
-
-                NavigationBarItem(selected = false, onClick = {}, icon = {
-                    Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
-                }, label = { Text("Profile", color = Color.White) })
-            }
-        },
         containerColor = Color.White
     ) { innerPadding ->
         Column(
@@ -97,14 +70,12 @@ fun DietScreen() {
             DietTrackerSection(viewModel)
 
             Text("Healthy Recipes", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            RecipeGrid(LocalContext.current)
+            RecipeGrid(context)
 
-            // Record list
             if (viewModel.dietHistory.isNotEmpty()) {
                 Text("Saved Records", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 SavedRecordsList(viewModel)
             }
-
         }
     }
 }
@@ -135,7 +106,10 @@ fun RecipeGrid(context: android.content.Context) {
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         for (row in items.chunked(2)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 row.forEach { item ->
                     Box(
                         modifier = Modifier
@@ -250,13 +224,12 @@ fun DietTrackerSection(viewModel: DietViewModel) {
 
 @Composable
 fun SavedRecordsList(viewModel: DietViewModel) {
-    // Load history when composable is shown
     LaunchedEffect(Unit) {
         viewModel.loadHistory()
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        for (record in viewModel.dietHistory) {
+        viewModel.dietHistory.forEach { record ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
@@ -270,16 +243,13 @@ fun SavedRecordsList(viewModel: DietViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
-                            text = "${record.foodName} - ${record.calories} kcal",
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.Black
-                        )
+                        Text("${record.foodName} - ${record.calories} kcal", fontWeight = FontWeight.SemiBold, color = Color.Black)
+
                         val formattedTime = remember(record.timestamp) {
-                            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
-                                .format(java.util.Date(record.timestamp))
+                            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(record.timestamp))
                         }
-                        Text(text = formattedTime, fontSize = 12.sp, color = Color.Gray)
+
+                        Text(formattedTime, fontSize = 12.sp, color = Color.Gray)
 
                         val tags = listOfNotNull(
                             if (record.isBreakfast) "Breakfast" else null,
@@ -287,11 +257,10 @@ fun SavedRecordsList(viewModel: DietViewModel) {
                             if (record.isDinner) "Dinner" else null
                         )
                         if (tags.isNotEmpty()) {
-                            Text(text = "Meal: ${tags.joinToString()}", fontSize = 13.sp, color = Color.DarkGray)
+                            Text("Meal: ${tags.joinToString()}", fontSize = 13.sp, color = Color.DarkGray)
                         }
                     }
 
-                    // Delete icon button
                     IconButton(onClick = { viewModel.deleteDiet(record) }) {
                         Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                     }
@@ -299,12 +268,4 @@ fun SavedRecordsList(viewModel: DietViewModel) {
             }
         }
     }
-}
-
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DietScreenPreview() {
-    DietScreen()
 }

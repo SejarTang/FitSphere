@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
 
 
 import androidx.compose.runtime.rememberCoroutineScope
@@ -87,15 +87,8 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}, onStart: () -> Unit = {}) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
-        },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Home, null, tint = Color.White) }, label = { Text("Home", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(true, {}, icon = { Icon(Icons.Default.DirectionsWalk, null, tint = Color.White) }, label = { Text("Workout", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Coffee, null, tint = Color.White) }, label = { Text("Diet", color = Color.White) }, alwaysShowLabel = true)
-                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Person, null, tint = Color.White) }, label = { Text("Profile", color = Color.White) }, alwaysShowLabel = true)
-            }
         }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -124,7 +117,9 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}, onStart: () -> Unit = {}) {
                         contentColor = if (isSelected) Color.White else Color.Black
                     ),
                     shape = RoundedCornerShape(50),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 ) {
                     Icon(icon, contentDescription = type, modifier = Modifier.padding(end = 8.dp))
                     Text(type, fontSize = 16.sp)
@@ -143,6 +138,7 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}, onStart: () -> Unit = {}) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

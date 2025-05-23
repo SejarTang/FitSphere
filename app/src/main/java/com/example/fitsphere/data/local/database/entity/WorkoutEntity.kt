@@ -1,9 +1,9 @@
-package com.example.myapplication.data.local.database.entity
+package com.example.fitsphere.data.local.database.entity
 
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.myapplication.data.local.database.entity.LatLngEntity
+import com.example.fitsphere.data.local.database.entity.LatLngEntity
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

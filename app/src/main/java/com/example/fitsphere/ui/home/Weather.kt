@@ -1,4 +1,4 @@
-package com.example.myapplication.mainScreenPage
+package com.example.fitsphere.ui.home
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -17,8 +17,8 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import com.example.myapplication.api.OneCallWeatherResponse
-import com.example.myapplication.api.WeatherApiService
+import com.example.fitsphere.data.remote.OneCallWeatherResponse
+import com.example.fitsphere.data.remote.WeatherApiService
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

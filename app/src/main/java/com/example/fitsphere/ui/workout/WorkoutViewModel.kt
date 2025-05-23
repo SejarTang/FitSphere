@@ -6,10 +6,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.dao.WorkoutDao
-import com.example.myapplication.data.local.database.entity.LatLngEntity
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
-import com.example.myapplication.data.local.database.FitSphereDatabase
+import com.example.fitsphere.dao.WorkoutDao
+import com.example.fitsphere.data.local.database.entity.LatLngEntity
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
+import com.example.fitsphere.data.local.database.FitSphereDatabase
 import kotlinx.coroutines.flow.*
 
 class WorkoutViewModel(application: Application) : AndroidViewModel(application) {

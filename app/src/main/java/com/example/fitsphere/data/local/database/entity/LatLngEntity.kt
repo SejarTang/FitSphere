@@ -1,4 +1,4 @@
-package com.example.myapplication.data.local.database.entity
+package com.example.fitsphere.data.local.database.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

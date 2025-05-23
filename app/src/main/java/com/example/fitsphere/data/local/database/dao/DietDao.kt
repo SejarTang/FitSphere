@@ -1,7 +1,7 @@
-package com.example.myapplication.data.local.database.dao
+package com.example.fitsphere.data.local.database.dao
 
 import androidx.room.*
-import com.example.myapplication.data.local.database.entity.DietEntity
+import com.example.fitsphere.data.local.database.entity.DietEntity
 
 @Dao
 interface DietDao {

@@ -2,7 +2,6 @@
 
 package com.example.fitsphere.ui.workout
 
-import com.example.myapplication.data.local.database.entity.WorkoutEntity
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -28,16 +28,29 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun WorkoutDetailScreen(entry: WorkoutEntity) {
+fun WorkoutDetailScreen(
+    entry: WorkoutEntity,
+    onBack: () -> Unit = {} // ✅ 新增参数
+) {
     val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         .format(Date(entry.startTime))
     val routePoints = entry.route.map { LatLng(it.latitude, it.longitude) }
 
-    /***
-     * ⚠️ 这里去掉了 bottomBar 参数
-     */
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Workout Details", color = Color.Black) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        },
+        containerColor = Color.White
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -55,7 +68,6 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                 tint = Color.Black
             )
 
-            // 时间 & 距离
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -71,7 +83,6 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                 WorkoutInfoCard("Distance (km)", "%.2f".format(entry.distance))
             }
 
-            // 海拔 & 卡路里
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -82,7 +93,6 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
 
             Divider()
 
-            // 路线地图
             if (routePoints.isNotEmpty()) {
                 AndroidView(
                     modifier = Modifier
@@ -127,7 +137,6 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                 }
             }
 
-            // 评分
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
                 repeat(4) {

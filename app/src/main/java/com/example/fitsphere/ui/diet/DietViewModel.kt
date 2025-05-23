@@ -1,11 +1,11 @@
-package com.example.myapplication.ui.diet
+package com.example.fitsphere.ui.diet
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.local.database.entity.DietEntity
-import com.example.myapplication.data.repository.DietRepository
+import com.example.fitsphere.data.local.database.entity.DietEntity
+import com.example.fitsphere.data.repository.DietRepository
 import kotlinx.coroutines.launch
 
 /**
