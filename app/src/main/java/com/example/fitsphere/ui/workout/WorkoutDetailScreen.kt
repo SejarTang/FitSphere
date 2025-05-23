@@ -20,17 +20,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.fitsphere.data.local.database.entity.WorkoutEntity
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.Style
+import org.maplibre.gl.maps.MapView
+import org.maplibre.gl.maps.Style
+import org.maplibre.gl.maps.CameraOptions
+import org.maplibre.gl.maps.plugin.locationcomponent.location
+import org.maplibre.gl.maps.plugin.Plugin
+
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun WorkoutDetailScreen(
     entry: WorkoutEntity,
-    onBack: () -> Unit = {} // ✅ 新增参数
+    onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -105,20 +107,18 @@ fun WorkoutDetailScreen(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.MATCH_PARENT
                             )
-                            getMapAsync { mapboxMap ->
-                                mapboxMap.setStyle(
-                                    Style.Builder()
-                                        .fromUri("https://demotiles.maplibre.org/style.json")
+                            getMapAsync { mapLibreMap ->
+                                mapLibreMap.setStyle(
+                                    Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")
                                 ) {
-                                    mapboxMap.moveCamera(
+                                    mapLibreMap.moveCamera(
                                         CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0)
                                     )
-                                    val polyline =
-                                        com.mapbox.mapboxsdk.annotations.PolylineOptions()
-                                            .addAll(routePoints)
-                                            .color(0xFF3F51B5.toInt())
-                                            .width(5f)
-                                    mapboxMap.addPolyline(polyline)
+                                    val polyline = PolylineOptions()
+                                        .addAll(routePoints)
+                                        .color(0xFF3F51B5.toInt())
+                                        .width(5f)
+                                    mapLibreMap.addPolyline(polyline)
                                 }
                             }
                         }

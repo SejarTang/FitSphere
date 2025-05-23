@@ -12,9 +12,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://jitpack.io")
+            url = uri("https://maven.maplibre.org")
         }
-        //maven { url = uri("https://api.mapbox.com/downloads/v2/releases/maven") }
     }
 }
 

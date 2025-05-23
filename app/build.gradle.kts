@@ -93,7 +93,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    implementation("org.maplibre.gl:android-sdk:9.5.0")
+    implementation("org.maplibre.gl:android-sdk:9.5.0@aar")
+    implementation ("org.maplibre.gl:android-plugin-annotation-v9:1.0.0")
+
 
 
 
