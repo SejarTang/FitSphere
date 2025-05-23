@@ -1,4 +1,5 @@
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
+
 
 import com.example.myapplication.data.local.database.entity.WorkoutEntity
 import com.example.myapplication.ui.workout.WorkoutNavHost
@@ -20,12 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fitsphere.ui.workout.WorkoutViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FitnessHomeScreen(
+fun WorkoutHomeScreen(
     viewModel: WorkoutViewModel,
     onStartWorkout: () -> Unit,
     navController: NavController

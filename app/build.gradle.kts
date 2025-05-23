@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.example.fitsphere"
     compileSdk = 35
 
     defaultConfig {

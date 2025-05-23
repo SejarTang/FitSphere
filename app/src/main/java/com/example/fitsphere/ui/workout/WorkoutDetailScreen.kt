@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
 
 import com.example.myapplication.data.local.database.entity.WorkoutEntity
 import android.view.ViewGroup
@@ -30,43 +30,14 @@ import java.util.*
 @Composable
 fun WorkoutDetailScreen(entry: WorkoutEntity) {
     val context = LocalContext.current
-    val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(entry.startTime))
+    val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        .format(Date(entry.startTime))
     val routePoints = entry.route.map { LatLng(it.latitude, it.longitude) }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
-        }
-    ) { padding ->
+    /***
+     * ⚠️ 这里去掉了 bottomBar 参数
+     */
+    Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -84,16 +55,23 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                 tint = Color.Black
             )
 
+            // 时间 & 距离
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 val durationMin = (entry.duration / 60).toInt()
-                val durationStr = String.format("%02d:%02d:%02d", durationMin / 60, durationMin % 60, (entry.duration % 60))
+                val durationStr = String.format(
+                    "%02d:%02d:%02d",
+                    durationMin / 60,
+                    durationMin % 60,
+                    (entry.duration % 60)
+                )
                 WorkoutInfoCard("Duration", durationStr)
                 WorkoutInfoCard("Distance (km)", "%.2f".format(entry.distance))
             }
 
+            // 海拔 & 卡路里
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -104,6 +82,7 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
 
             Divider()
 
+            // 路线地图
             if (routePoints.isNotEmpty()) {
                 AndroidView(
                     modifier = Modifier
@@ -112,14 +91,23 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                         .clip(RoundedCornerShape(12.dp)),
                     factory = { ctx ->
                         MapView(ctx).apply {
-                            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                            )
                             getMapAsync { mapboxMap ->
-                                mapboxMap.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) { style ->
-                                    mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0))
-                                    val polyline = com.mapbox.mapboxsdk.annotations.PolylineOptions()
-                                        .addAll(routePoints)
-                                        .color(0xFF3F51B5.toInt())
-                                        .width(5f)
+                                mapboxMap.setStyle(
+                                    Style.Builder()
+                                        .fromUri("https://demotiles.maplibre.org/style.json")
+                                ) {
+                                    mapboxMap.moveCamera(
+                                        CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0)
+                                    )
+                                    val polyline =
+                                        com.mapbox.mapboxsdk.annotations.PolylineOptions()
+                                            .addAll(routePoints)
+                                            .color(0xFF3F51B5.toInt())
+                                            .width(5f)
                                     mapboxMap.addPolyline(polyline)
                                 }
                             }
@@ -139,6 +127,7 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
                 }
             }
 
+            // 评分
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
                 repeat(4) {
@@ -155,9 +144,7 @@ fun WorkoutDetailScreen(entry: WorkoutEntity) {
 
 @Composable
 fun WorkoutInfoCard(title: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))

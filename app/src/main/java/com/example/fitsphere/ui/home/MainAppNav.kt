@@ -1,4 +1,5 @@
-package com.example.myapplication.mainScreenPage
+package com.example.fitsphere.ui.home
+
 
 /*
 This setup includes:
@@ -9,13 +10,14 @@ This setup includes:
 
 // File: AppNav.kt
 
-import HomeScreen
+import com.example.fitsphere.ui.home.HomeScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.myapplication.mainScreenPage.WorkoutDetailScreen
 
 
 @Composable

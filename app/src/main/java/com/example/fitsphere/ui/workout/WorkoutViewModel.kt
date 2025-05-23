@@ -1,4 +1,5 @@
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
+
 
 
 import android.app.Application

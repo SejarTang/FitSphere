@@ -10,7 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.workout.WorkoutViewModel
+import com.example.fitsphere.ui.workout.WorkoutDetailScreen
+import com.example.fitsphere.ui.workout.WorkoutHomeScreen
+import com.example.fitsphere.ui.workout.WorkoutViewModel
 import com.example.myapplication.data.local.database.entity.WorkoutEntity
 
 @Composable
@@ -37,7 +39,7 @@ fun WorkoutNavHost(viewModel: WorkoutViewModel) {
 
 
         composable("history") {
-            FitnessHomeScreen(
+            WorkoutHomeScreen(
                 viewModel = viewModel,
                 onStartWorkout = { navController.navigate("start") },
                 navController = navController

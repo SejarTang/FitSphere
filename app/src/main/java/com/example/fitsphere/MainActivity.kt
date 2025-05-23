@@ -1,8 +1,9 @@
-package com.example.myapplication
+package com.example.fitsphere
 import com.example.myapplication.di.DatabaseProvider
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.fitsphere.ui.diet.DietScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 //import com.example.myapplication.ui.navigation.AppNavigation
 
@@ -16,7 +17,7 @@ class MainActivity : ComponentActivity() {
 //                val navController = rememberNavController()
 //                AppNavGraph(navController = navController)
                 // Set the content to DietScreen or Navigation host
-                DietScreen()
+                MainScreen()
                 //AppNavigation()
             }
         }

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
-import com.example.myapplication.ui.workout.WorkoutViewModel
+import com.example.fitsphere.ui.workout.WorkoutViewModel
 import kotlinx.coroutines.delay
 
 

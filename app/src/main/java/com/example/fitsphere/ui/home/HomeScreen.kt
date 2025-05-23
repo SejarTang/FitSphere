@@ -1,4 +1,5 @@
-import android.content.Intent
+package com.example.fitsphere.ui.home
+
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,16 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.rememberAsyncImagePainter
-import com.example.myapplication.R
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.fitsphere.R
 
 data class GridItem(
     val title: String,
@@ -46,38 +41,6 @@ fun HomeScreen(navController: NavController) {
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("workout/cardio") },
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("diet") },
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("profile") },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
-        },
         containerColor = Color.White
     ) { innerPadding ->
         Column(
@@ -88,9 +51,15 @@ fun HomeScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            SectionWithBackground(title = "Today's Weather", content = "22°C  |  Wind: 12 km/h")
+            SectionWithBackground(
+                title = "Today's Weather",
+                content = "22°C  |  Wind: 12 km/h"
+            )
 
-            SectionWithBackground(title = "Fitness Tips", content = "Remember to warm up before your workout and stay hydrated throughout your training.")
+            SectionWithBackground(
+                title = "Fitness Tips",
+                content = "Remember to warm up before your workout and stay hydrated throughout your training."
+            )
 
             Text("Explore Workouts", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             WorkoutGrid(navController = navController)
@@ -167,18 +136,5 @@ fun WorkoutGrid(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    MaterialTheme {
-        val navController = rememberNavController()
-        HomeScreen(navController = navController)
     }
 }

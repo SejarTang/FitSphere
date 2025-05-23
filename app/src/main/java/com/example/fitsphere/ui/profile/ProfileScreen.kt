@@ -1,6 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.myapplication
+package com.example.fitsphere.ui.profile
+
+
+
 
 import androidx.compose.ui.graphics.Color
 
@@ -26,7 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.R
+import com.example.fitsphere.R
+
 
 @Composable
 fun ProfileScreen() {

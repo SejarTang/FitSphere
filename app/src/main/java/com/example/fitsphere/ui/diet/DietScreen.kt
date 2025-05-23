@@ -1,6 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.myapplication
+package com.example.fitsphere.ui.diet
+
+
+
 
 import android.content.Intent
 import android.net.Uri
@@ -34,6 +37,8 @@ import com.example.myapplication.data.local.database.entity.DietEntity
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.navigation.NavController
+import com.example.fitsphere.R
+
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 

@@ -24,7 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.data.local.database.entity.LatLngEntity
-import com.example.myapplication.ui.workout.WorkoutViewModel
+import com.example.fitsphere.ui.workout.WorkoutViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

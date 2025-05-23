@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.myapplication.ui.workout
+package com.example.fitsphere.ui.workout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
