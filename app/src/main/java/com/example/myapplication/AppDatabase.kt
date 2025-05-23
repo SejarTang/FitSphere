@@ -9,7 +9,7 @@ import com.example.myapplication.dao.WorkoutDao
 import com.example.myapplication.Converters
 import com.example.myapplication.workout.WorkoutEntry
 
-@Database(entities = [WorkoutEntry::class], version = 2)
+@Database(entities = [WorkoutEntry::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun workoutDao(): WorkoutDao
@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "fit_db"
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
             }
         }
     }

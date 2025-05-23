@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.navigation.compose.jvmstubs)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
@@ -89,6 +90,6 @@ dependencies {
     implementation("io.grpc:grpc-android:1.70.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation(libs.firebase.auth)
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+//    implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("io.coil-kt:coil-compose:2.4.0")
 }
