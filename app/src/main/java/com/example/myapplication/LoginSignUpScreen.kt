@@ -47,13 +47,14 @@ fun LoginSignUpScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // use id token to do google login
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken("620727711916-sng865hss8vm3vctdlouh89b5oo0n6qi.apps.googleusercontent.com")
         .requestEmail()
         .build()
 
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
-
+    //  integrate firebase with google
     val googleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
@@ -112,7 +113,7 @@ fun LoginSignUpScreen(
 
         Button(
             onClick = {
-                // TODO: handle login or signup
+                // after user click, trigger here to get user related data from firestore
                 coroutineScope.launch(Dispatchers.IO) {
                     val userSnapshot = firestore.collection("Users").document(email).get().await()
                     withContext(Dispatchers.Main) { // Switch to main thread for UI operations
