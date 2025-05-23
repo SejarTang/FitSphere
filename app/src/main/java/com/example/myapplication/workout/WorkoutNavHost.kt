@@ -38,7 +38,8 @@ fun WorkoutNavHost(viewModel: WorkoutViewModel) {
         composable("history") {
             FitnessHomeScreen(
                 viewModel = viewModel,
-                onStartWorkout = { navController.navigate("start") }
+                onStartWorkout = { navController.navigate("start") },
+                navController = navController
             )
         }
 

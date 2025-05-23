@@ -37,6 +37,7 @@ fun AppNav() {
         ) { backStackEntry ->
             val args = backStackEntry.arguments!!
             WorkoutDetailScreen(
+                navController = navController,
                 title = args.getString("title")!!,
                 videoId = args.getString("videoId")!!,
                 description = args.getString("description")!!,

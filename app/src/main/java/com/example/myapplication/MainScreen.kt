@@ -27,6 +27,15 @@ import com.example.myapplication.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
+data class GridItem(
+    val title: String,
+    val imageRes: Int,
+    val videoId: String,
+    val description: String,
+    val intensity: String,
+    val duration: String
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -108,15 +117,18 @@ fun SectionWithBackground(title: String, content: String) {
 @Composable
 fun WorkoutGrid(navController: NavController) {
     val items = listOf(
-        GridItem("Cardio", R.drawable.cardio, "cardio"),
-        GridItem("Yoga", R.drawable.yoga, "yoga"),
-        GridItem("HIIT", R.drawable.hiit, "hiit"),
-        GridItem("Strength", R.drawable.stretching, "strength")
+        GridItem("Cardio", R.drawable.cardio, "ml6cT4AZdqI", "30-minute cardio session", "Medium", "30"),
+        GridItem("Yoga", R.drawable.yoga, "v7AYKMP6rOE", "Yoga for beginners", "Easy", "20"),
+        GridItem("HIIT", R.drawable.hiit, "ml6cT4AZdqI", "Full body HIIT", "Hard", "20"),
+        GridItem("Strength", R.drawable.stretching, "UoC_O3HzsH0", "Strength building", "Medium", "30")
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         for (row in items.chunked(2)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 row.forEach { item ->
                     Box(
                         modifier = Modifier
@@ -124,10 +136,16 @@ fun WorkoutGrid(navController: NavController) {
                             .clip(RoundedCornerShape(12.dp))
                             .background(Color(0xFFE0E0E0))
                             .clickable {
-                                navController.navigate("workout/${item.link}")
+                                val title = Uri.encode(item.title)
+                                val videoId = Uri.encode(item.videoId)
+                                val description = Uri.encode(item.description)
+                                val intensity = Uri.encode(item.intensity)
+                                val duration = item.duration
+                                navController.navigate("workout/$title/$videoId/$description/$intensity/$duration")
                             }
+                            .padding(8.dp)
                     ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Image(
                                 painter = painterResource(id = item.imageRes),
                                 contentDescription = item.title,
@@ -135,18 +153,15 @@ fun WorkoutGrid(navController: NavController) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(100.dp)
+                                    .clip(RoundedCornerShape(8.dp))
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.White)
-                                    .padding(8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(item.title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                            }
+                            Text(
+                                item.title,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Black
+                            )
                         }
                     }
                 }
@@ -155,7 +170,8 @@ fun WorkoutGrid(navController: NavController) {
     }
 }
 
-data class GridItem(val title: String, val imageRes: Int, val link: String)
+
+
 
 
 @Preview(showBackground = true)
