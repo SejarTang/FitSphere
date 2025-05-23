@@ -60,6 +60,7 @@ fun ProfileScreen(email: String) {
     var currentEmail by remember { mutableStateOf(email) }
     var password: String = "default"
     LaunchedEffect(currentEmail) {
+        // according to current user type, fetch data from different database
         if (googleUser != null) {
             name = googleUser.displayName.orEmpty()
             currentEmail = googleUser.email.orEmpty()
@@ -235,6 +236,7 @@ fun ProfileScreen(email: String) {
             Button(
                 onClick = {
                     coroutineScope.launch(Dispatchers.IO) {
+                        // update data to firestore
                         val newUserData = mapOf(
                             "email" to currentEmail,
                             "name" to name,
