@@ -4,6 +4,12 @@
 //        classpath("com.google.dagger:hilt-android-gradle-plugin:2.48")
 //    }
 //}
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22")
+    }
+}
+
 
 plugins {
     id("com.android.application") version "8.7.3" apply false

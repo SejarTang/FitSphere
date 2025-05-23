@@ -4,6 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     // id("dagger.hilt.android.plugin")
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -17,6 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPBOX_ACCESS_TOKEN"] = project.findProperty("MAPBOX_DOWNLOADS_TOKEN") as? String ?: ""
     }
 
     buildTypes {
@@ -90,6 +92,7 @@ dependencies {
     // Google Maps & Location
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.maplibre.gl:android-sdk:9.5.0")
 
     // Accompanist Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")

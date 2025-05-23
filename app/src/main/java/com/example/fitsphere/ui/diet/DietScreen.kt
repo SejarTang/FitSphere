@@ -33,6 +33,7 @@ import com.example.myapplication.ui.diet.DietViewModel
 import com.example.myapplication.data.local.database.entity.DietEntity
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.navigation.NavController
 
 data class GridItem(val title: String, val imageRes: Int, val link: String)
 
