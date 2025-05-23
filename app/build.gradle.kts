@@ -10,7 +10,7 @@ plugins {
 android {
     namespace = "com.example.fitsphere"
     compileSdk = 35
-
+2
     defaultConfig {
         applicationId = "com.example.myapplication"
         minSdk = 24
@@ -92,7 +92,10 @@ dependencies {
     // Google Maps & Location
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
     implementation("org.maplibre.gl:android-sdk:9.5.0")
+
+
 
     // Accompanist Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
