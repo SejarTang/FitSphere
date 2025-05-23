@@ -1,6 +1,8 @@
 package com.example.myapplication.workout
 
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.myapplication.WorkoutViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,7 +27,8 @@ import java.util.*
 @Composable
 fun FitnessHomeScreen(
     viewModel: WorkoutViewModel,
-    onStartWorkout: () -> Unit
+    onStartWorkout: () -> Unit,
+    navController: NavController
 ) {
     val workoutHistory by viewModel.workoutList.collectAsState()
 
@@ -80,7 +84,6 @@ fun FitnessHomeScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Start Workout Button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,7 +99,6 @@ fun FitnessHomeScreen(
                 }
             }
 
-            // History Title
             Text(
                 text = "Workout History",
                 fontSize = 18.sp,
@@ -105,10 +107,9 @@ fun FitnessHomeScreen(
                 color = Color.Black
             )
 
-            // Workout List
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(workoutHistory) { entry ->
-                    WorkoutRecordItem(entry)
+                    WorkoutRecordItem(entry, navController)
                 }
             }
         }
@@ -116,10 +117,9 @@ fun FitnessHomeScreen(
 }
 
 @Composable
-fun WorkoutRecordItem(entry: WorkoutEntry) {
+fun WorkoutRecordItem(entry: WorkoutEntry, navController: NavController) {
     val dateTime = remember(entry.startTime) {
-        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            .format(Date(entry.startTime))
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(entry.startTime))
     }
 
     val durationMin = (entry.duration / 60).toInt()
@@ -130,6 +130,11 @@ fun WorkoutRecordItem(entry: WorkoutEntry) {
             .padding(8.dp)
             .clip(RoundedCornerShape(50))
             .background(Color(0xFFE0E0E0))
+            .clickable {
+
+                navController.currentBackStackEntry?.savedStateHandle?.set("workoutEntry", entry)
+                navController.navigate("detail")
+            }
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
