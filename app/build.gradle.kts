@@ -76,6 +76,18 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.coil.compose)
+//    implementation(libs.firebase.auth)
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("io.grpc:grpc-okhttp:1.70.0")
+    implementation("io.grpc:grpc-protobuf-lite:1.70.0")
+    implementation("io.grpc:grpc-stub:1.70.0")
+    implementation("io.grpc:grpc-android:1.70.0")
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation(libs.firebase.auth)
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("io.coil-kt:coil-compose:2.4.0")

@@ -5,6 +5,7 @@ package com.example.myapplication
 import androidx.compose.ui.graphics.Color
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -26,16 +27,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.R
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(email: String) {
     val context = LocalContext.current
+    val googleUser = Firebase.auth.currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    val coroutineScope = rememberCoroutineScope()
 
-    var name by remember { mutableStateOf("John Doe") }
+    var name by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("70") }
     var goal by remember { mutableStateOf("Build Muscle") }
-
     val genderOptions = listOf("Male", "Female", "Other")
     val ageOptions = (12..100).map { it.toString() }
 
@@ -47,44 +56,30 @@ fun ProfileScreen() {
 
     // Image Picker
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+
+    var currentEmail by remember { mutableStateOf(email) }
+    var password: String = "default"
+    LaunchedEffect(currentEmail) {
+        // according to current user type, fetch data from different database
+        if (googleUser != null) {
+            name = googleUser.displayName.orEmpty()
+            currentEmail = googleUser.email.orEmpty()
+            imageUri = googleUser.photoUrl
+        } else {
+            val targetUser = firestore.collection("Users").document(currentEmail).get().await()
+            name = targetUser.getString("name").orEmpty()
+            weight = targetUser.getString("weight") ?: "70"
+            goal = targetUser.getString("goal") ?: "Build Muscle"
+            gender = targetUser.getString("gender") ?: "Male"
+            imageUri = Uri.parse(targetUser.getString("imageUri").orEmpty())
+            password = targetUser.getString("password").orEmpty()
+        }
+    }
+    var imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
     }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* current */ },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
-        }
-    ) { padding ->
+    Scaffold() { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -207,7 +202,28 @@ fun ProfileScreen() {
 
             Button(
                 onClick = {
-                    // TODO: Save info
+                    coroutineScope.launch(Dispatchers.IO) {
+                        // update data to firestore
+                        val newUserData = mapOf(
+                            "email" to currentEmail,
+                            "name" to name,
+                            "weight" to weight,
+                            "gender" to gender,
+                            "imageUri" to imageUri,
+                            "age" to age,
+                            "password" to password
+                        )
+                        try {
+                            firestore.collection("Users").document(currentEmail).set(newUserData).await()
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Save Successful", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Save Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -220,5 +236,6 @@ fun ProfileScreen() {
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewProfileScreen() {
-    ProfileScreen()
+    val email = "test@gmail.com"
+    ProfileScreen(email)
 }
