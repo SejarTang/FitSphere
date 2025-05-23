@@ -82,21 +82,13 @@ fun SignUpScreen(
             onClick = {
                 loading = true
                 errorMessage = null
-//                auth.createUserWithEmailAndPassword(email, password)
-//                    .addOnCompleteListener { task ->
-//                        loading = false
-//                        if (task.isSuccessful) {
-//                            Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
-//                            onSuccess()
-//                        } else {
-//                            errorMessage = task.exception?.message ?: "Registration failed"
-//                        }
-//                    }
+                // upload map data to firebase database, containing the email, password and name
                 val user = mapOf(
                     "name" to name,
                     "email" to email,
                     "password" to password
                 )
+                // start a new coroutine to link firebase with android studio device
                 coroutineScope.launch(Dispatchers.IO) {
                     firestore.collection("Users").document(email).set(
                         user
