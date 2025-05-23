@@ -1,4 +1,4 @@
-package com.example.myapplication.viewmodel
+package com.example.myapplication.mainScreenPage
 
 import OneCallWeatherResponse
 import androidx.lifecycle.ViewModel
@@ -35,7 +35,7 @@ class ViewWeatherModel : ViewModel() {
 
                 _weatherData.value = current
 
-                // 解析前6小时数据
+
                 _hourlyData.value = hourly.list.take(6).map {
                     HourlyWeather(
                         time = unixToHour(it.dt),

@@ -1,3 +1,4 @@
+package com.example.myapplication
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -27,6 +28,16 @@ import com.example.myapplication.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.remember
+import com.example.myapplication.GridItem
+
 data class GridItem(
     val title: String,
     val imageRes: Int,
@@ -35,10 +46,11 @@ data class GridItem(
     val intensity: String,
     val duration: String
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,7 +100,35 @@ fun HomeScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            SectionWithBackground(title = "Today's Weather", content = "22°C  |  Wind: 12 km/h")
+            val locationPermissionGranted = remember {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+            val locationFetched = remember { mutableStateOf(false) }
+
+            LaunchedEffect(locationPermissionGranted) {
+                if (locationPermissionGranted && !locationFetched.value) {
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                    try {
+                        val location = fusedLocationClient.lastLocation.await()
+                        if (location != null) {
+                            navController.navigate("weatherShow")
+                        }
+                        locationFetched.value = true
+                    } catch (_: Exception) {}
+                }
+            }
+
+            SectionWithBackground(
+                title = "Today's Weather",
+                content = "Tap to see weather",
+                onClick = {
+                    navController.navigate("weatherShow")
+                }
+            )
 
             SectionWithBackground(title = "Fitness Tips", content = "Remember to warm up before your workout and stay hydrated throughout your training.")
 
@@ -100,12 +140,13 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun SectionWithBackground(title: String, content: String) {
+fun SectionWithBackground(title: String, content: String, onClick: (() -> Unit)? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF2F2F2))
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
             .padding(16.dp)
     ) {
         Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
@@ -170,10 +211,6 @@ fun WorkoutGrid(navController: NavController) {
     }
 }
 
-
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
@@ -182,3 +219,26 @@ fun HomeScreenPreview() {
         HomeScreen(navController = navController)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
