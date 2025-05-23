@@ -1,5 +1,3 @@
-package com.example.myapplication.api
-
 data class OneCallWeatherResponse(
     val current: Current
 )
@@ -7,5 +5,12 @@ data class OneCallWeatherResponse(
 data class Current(
     val temp: Double,
     val humidity: Int,
-    val wind_speed: Double
+    val wind_speed: Double,
+    val weather: List<Weather>
+)
+
+data class Weather(
+    val main: String,
+    val description: String,
+    val icon: String
 )
