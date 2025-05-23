@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.myapplication
+package com.example.myapplication.workout
 
 import android.view.ViewGroup
 import androidx.compose.foundation.background

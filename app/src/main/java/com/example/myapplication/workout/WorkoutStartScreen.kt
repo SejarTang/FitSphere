@@ -1,4 +1,5 @@
-package com.example.myapplication
+package com.example.myapplication.workout
+
 
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.background
@@ -11,19 +12,51 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.*
+import com.example.myapplication.WorkoutViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.example.myapplication.LatLngEntity
+import com.example.myapplication.workout.WorkoutEntry
+import com.example.myapplication.workout.LocationService
+import com.example.myapplication.workout.WorkoutSessionScreen
+
+
+
+@Composable
+fun WorkoutNavHost() {
+    val navController = rememberNavController()
+    val viewModel: WorkoutViewModel = viewModel()
+
+    NavHost(navController = navController, startDestination = "start") {
+        composable("start") {
+            StartWorkoutScreen(
+                onBack = {},
+                onStart = {
+                    navController.navigate("session")
+                }
+            )
+        }
+        composable("session") {
+            WorkoutSessionScreen(
+                navController = navController,
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+    }
+    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StartWorkoutScreen(onBack: () -> Unit = {}) {
+fun StartWorkoutScreen(onBack: () -> Unit = {}, onStart: () -> Unit = {}) {
     val workoutTypes = listOf("Running", "Cycling", "Hiking")
     var selectedType by remember { mutableStateOf("Running") }
 
@@ -35,13 +68,11 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
     var elapsedTime by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
 
-    // 启动 GPS 更新
     LaunchedEffect(Unit) {
         locationService.reset()
         locationService.startLocationUpdates()
     }
 
-    // 自动计时
     if (workoutStartTime != null) {
         LaunchedEffect(workoutStartTime) {
             while (true) {
@@ -65,34 +96,10 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
         },
         bottomBar = {
             NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
+                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Home, null, tint = Color.White) }, label = { Text("Home", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(true, {}, icon = { Icon(Icons.Default.DirectionsWalk, null, tint = Color.White) }, label = { Text("Workout", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Coffee, null, tint = Color.White) }, label = { Text("Diet", color = Color.White) }, alwaysShowLabel = true)
+                NavigationBarItem(false, {}, icon = { Icon(Icons.Default.Person, null, tint = Color.White) }, label = { Text("Profile", color = Color.White) }, alwaysShowLabel = true)
             }
         }
     ) { innerPadding ->
@@ -106,7 +113,6 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Select Workout Type", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-
             Spacer(modifier = Modifier.height(24.dp))
 
             workoutTypes.forEach { type ->
@@ -124,9 +130,7 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
                         contentColor = if (isSelected) Color.White else Color.Black
                     ),
                     shape = RoundedCornerShape(50),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 ) {
                     Icon(icon, contentDescription = type, modifier = Modifier.padding(end = 8.dp))
                     Text(type, fontSize = 16.sp)
@@ -135,43 +139,12 @@ fun StartWorkoutScreen(onBack: () -> Unit = {}) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            if (workoutStartTime == null) {
-                Button(
-                    onClick = {
-                        workoutStartTime = System.currentTimeMillis()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Start", fontSize = 18.sp)
-                }
-            } else {
-                Button(
-                    onClick = {
-                        val totalDistanceMeters = locationService.calculateTotalDistance()
-                        val distanceKm = totalDistanceMeters / 1000f
-                        val calories = (distanceKm * 60).toInt()
-                        val route = locationService.getRoute().map {
-                            LatLngEntity(it.latitude, it.longitude)
-                        }
-
-                        viewModel.saveWorkout(
-                            type = selectedType,
-                            startTime = workoutStartTime!!,
-                            duration = elapsedTime,
-                            distance = distanceKm,
-                            calories = calories,
-                            route = route
-                        )
-
-                        workoutStartTime = null
-                        elapsedTime = 0L
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Finish (${elapsedTime}s)", fontSize = 18.sp)
-                }
+            Button(
+                onClick = onStart,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Start", fontSize = 18.sp)
             }
         }
     }

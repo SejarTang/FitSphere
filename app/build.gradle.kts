@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    id("kotlin-parcelize")
     id("kotlin-kapt")
 }
 
@@ -54,6 +55,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -86,4 +88,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.70.0")
     implementation("io.grpc:grpc-android:1.70.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
+    implementation(libs.firebase.auth)
+    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
