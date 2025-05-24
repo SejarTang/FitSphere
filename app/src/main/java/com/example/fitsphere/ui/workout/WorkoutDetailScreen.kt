@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,18 +25,31 @@ import java.util.*
 @Composable
 fun WorkoutDetailScreen(
     entry: WorkoutEntity,
-    onBack: () -> Unit = {}
+    navController: NavController
 ) {
     val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         .format(Date(entry.startTime))
+
+
+    val durationStars = (entry.duration / 600).toInt()
+    val calorieStars = (entry.calories / 100)
+    val totalStars = (durationStars + calorieStars).coerceIn(1, 5)
+
+
+    val beatenPercent = (50 + totalStars * 10).coerceAtMost(99)
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Workout Details", color = Color.Black) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        navController.navigate("workout") {
+                            popUpTo("workout") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -86,15 +100,18 @@ fun WorkoutDetailScreen(
 
             Divider()
 
+
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
-                repeat(4) {
+                repeat(totalStars) {
                     Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
                 }
-                Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
+                repeat(5 - totalStars) {
+                    Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
+                }
             }
 
-            Text("You outperformed 82% of users!", fontWeight = FontWeight.Medium)
+            Text("You outperformed $beatenPercent% of users!", fontWeight = FontWeight.Medium)
             Text("Keep pushing your limits — you're doing great! 💪", fontSize = 14.sp)
         }
     }

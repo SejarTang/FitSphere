@@ -24,7 +24,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.fitsphere.data.local.database.entity.LatLngEntity
-import com.example.fitsphere.ui.workout.WorkoutViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -100,71 +99,79 @@ fun WorkoutSessionScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        // ✅ bottomBar 已删除
         containerColor = Color.White
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .navigationBarsPadding()
+                .padding(horizontal = 24.dp)
         ) {
-            Icon(
-                Icons.Default.DirectionsRun,
-                contentDescription = "Active",
-                modifier = Modifier.size(48.dp).rotate(rotatingAngle),
-                tint = Color.Black
-            )
-
-            StatItem("Duration", formattedTime)
-            StatItem("Distance (km)", String.format("%.2f", distanceKm))
-            StatItem("Elevation Gain (m)", "$elevationGain m")
-            StatItem("Estimated Calories Burned", "$calories kcal")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    locationService.stopLocationUpdates()
-
-                    val route = ArrayList(locationService.getRoute().map {
-                        LatLngEntity(it.latitude, it.longitude)
-                    })
-
-                    coroutineScope.launch {
-                        val workout = viewModel.saveWorkout(
-                            type = "Running",
-                            startTime = startTime,
-                            duration = elapsedSeconds,
-                            distance = distanceKm,
-                            calories = calories,
-                            route = route
-                        )
-
-                        viewModel.cacheWorkout(workout)
-
-                        navController.currentBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("workoutEntry", workout)
-
-                        navController.navigate("detail")
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("End Workout", fontSize = 18.sp)
-            }
+                Icon(
+                    Icons.Default.DirectionsRun,
+                    contentDescription = "Active",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .rotate(rotatingAngle),
+                    tint = Color.Black
+                )
 
+                StatItem("Duration", formattedTime)
+                StatItem("Distance (km)", String.format("%.2f", distanceKm))
+                StatItem("Elevation Gain (m)", "$elevationGain m")
+                StatItem("Estimated Calories Burned", "$calories kcal")
+
+                Spacer(modifier = Modifier.weight(1f)) // 👈 推送按钮到底部
+
+                Button(
+                    onClick = {
+                        locationService.stopLocationUpdates()
+
+                        val route = ArrayList(locationService.getRoute().map {
+                            LatLngEntity(it.latitude, it.longitude)
+                        })
+
+                        coroutineScope.launch {
+                            val workout = viewModel.saveWorkout(
+                                type = "Running",
+                                startTime = startTime,
+                                duration = elapsedSeconds,
+                                distance = distanceKm,
+                                calories = calories,
+                                route = route
+                            )
+
+                            viewModel.cacheWorkout(workout)
+
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("workoutEntry", workout)
+
+                            navController.navigate("detail")
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text("End Workout", fontSize = 18.sp)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp)) // 👈 留一点底部空隙
+            }
         }
     }
 }
-
 
 @Composable
 fun StatItem(title: String, value: String) {
