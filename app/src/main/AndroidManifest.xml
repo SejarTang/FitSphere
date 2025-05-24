@@ -14,8 +14,8 @@
         android:theme="@style/Theme.FitSphere"
         tools:targetApi="31">
         <meta-data
-            android:name="com.mapbox.SetTelemetryEnabled"
-            android:value="false" />
+            android:name="com.mapbox.maps.token"
+            android:value="pk.eyJ1IjoieHkxMTE5IiwiYSI6ImNtOWpuZHZwcDBmYmkybHB4ajVqbWVmZXEifQ.gtnPJLTokTT7d2xrYzTgYAn" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

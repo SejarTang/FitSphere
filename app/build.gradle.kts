@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.9.23"
     id("com.google.gms.google-services")
     // id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -93,9 +94,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    implementation("org.maplibre.gl:android-sdk:9.5.0@aar")
-    implementation ("org.maplibre.gl:android-plugin-annotation-v9:1.0.0")
-
 
 
 
@@ -105,7 +103,11 @@ dependencies {
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+
+    implementation("com.mapbox.maps:android:11.3.0")
+
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
     // kapt("com.google.dagger:hilt-compiler:2.48")

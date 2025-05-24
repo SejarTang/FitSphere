@@ -56,38 +56,38 @@ fun ProfileScreen() {
     }
 
     Scaffold(
-        bottomBar = {
-            NavigationBar(containerColor = Color.Black) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-                    label = { Text("Home", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-                    label = { Text("Workout", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-                    label = { Text("Diet", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* current */ },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-                    label = { Text("Profile", color = Color.White) },
-                    alwaysShowLabel = true
-                )
-            }
-        }
+//        bottomBar = {
+//            NavigationBar(containerColor = Color.Black) {
+//                NavigationBarItem(
+//                    selected = false,
+//                    onClick = { /* TODO */ },
+//                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
+//                    label = { Text("Home", color = Color.White) },
+//                    alwaysShowLabel = true
+//                )
+//                NavigationBarItem(
+//                    selected = false,
+//                    onClick = { /* TODO */ },
+//                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
+//                    label = { Text("Workout", color = Color.White) },
+//                    alwaysShowLabel = true
+//                )
+//                NavigationBarItem(
+//                    selected = false,
+//                    onClick = { /* TODO */ },
+//                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
+//                    label = { Text("Diet", color = Color.White) },
+//                    alwaysShowLabel = true
+//                )
+//                NavigationBarItem(
+//                    selected = true,
+//                    onClick = { /* current */ },
+//                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
+//                    label = { Text("Profile", color = Color.White) },
+//                    alwaysShowLabel = true
+//                )
+//            }
+//        }
     ) { padding ->
         Column(
             modifier = Modifier

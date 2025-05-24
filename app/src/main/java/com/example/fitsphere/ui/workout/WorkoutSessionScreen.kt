@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.fitsphere.ui.workout
 
 import android.Manifest
@@ -8,7 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,11 +27,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.fitsphere.data.local.database.entity.LatLngEntity
-import com.example.fitsphere.ui.workout.WorkoutViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSessionScreen(
     onBack: () -> Unit = {},
@@ -100,31 +101,7 @@ fun WorkoutSessionScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        // ✅ bottomBar 已删除
-        containerColor = Color.White
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.Default.DirectionsRun,
-                contentDescription = "Active",
-                modifier = Modifier.size(48.dp).rotate(rotatingAngle),
-                tint = Color.Black
-            )
-
-            StatItem("Duration", formattedTime)
-            StatItem("Distance (km)", String.format("%.2f", distanceKm))
-            StatItem("Elevation Gain (m)", "$elevationGain m")
-            StatItem("Estimated Calories Burned", "$calories kcal")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+        bottomBar = {
             Button(
                 onClick = {
                     locationService.stopLocationUpdates()
@@ -152,19 +129,43 @@ fun WorkoutSessionScreen(
                         navController.navigate("detail")
                     }
                 },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             ) {
                 Text("End Workout", fontSize = 18.sp)
             }
+        },
+        containerColor = Color.White
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Default.DirectionsRun,
+                contentDescription = "Active",
+                modifier = Modifier
+                    .size(48.dp)
+                    .rotate(rotatingAngle),
+                tint = Color.Black
+            )
 
+            StatItem("Duration", formattedTime)
+            StatItem("Distance (km)", String.format("%.2f", distanceKm))
+            StatItem("Elevation Gain (m)", "$elevationGain m")
+            StatItem("Estimated Calories Burned", "$calories kcal")
         }
     }
 }
-
 
 @Composable
 fun StatItem(title: String, value: String) {
