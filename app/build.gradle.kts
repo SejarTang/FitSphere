@@ -107,6 +107,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
     implementation("com.mapbox.maps:android:11.3.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
