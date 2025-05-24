@@ -17,14 +17,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun LoginScreen(
-    onSuccess: () -> Unit = {},
-    onSwitchToSignUp: () -> Unit = {},
+    onLoginSuccess: () -> Unit = {},
+    onGoToSignUp: () -> Unit = {},
+    onGoogleLoginClicked: () -> Unit,
     viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(LocalContext.current.applicationContext as Application))
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Observe ViewModel states
     val loading by viewModel.loading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
@@ -36,7 +36,6 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Log In", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
@@ -45,7 +44,6 @@ fun LoginScreen(
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
@@ -55,15 +53,25 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = { viewModel.login(email, password, onSuccess) },
+            onClick = { viewModel.login(email, password, onLoginSuccess) },
             modifier = Modifier.fillMaxWidth(),
             enabled = !loading
         ) {
             Text("Log In")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Google
+        Button(
+            onClick = onGoogleLoginClicked,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+        ) {
+            Text("Sign in with Google")
         }
 
         if (errorMessage != null) {
@@ -76,7 +84,7 @@ fun LoginScreen(
         Text(
             text = "Don't have an account? Sign up",
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable { onSwitchToSignUp() },
+            modifier = Modifier.clickable { onGoToSignUp() },
             textAlign = TextAlign.Center
         )
     }

@@ -2,11 +2,7 @@
 
 package com.example.fitsphere.ui.profile
 
-
-
-
-import androidx.compose.ui.graphics.Color
-
+import android.app.Application
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,8 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,71 +18,53 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.fitsphere.R
-
+import com.example.fitsphere.ui.auth.AuthViewModel
+import com.example.fitsphere.ui.auth.AuthViewModelFactory
+import com.example.fitsphere.ui.auth.UserProfile
 
 @Composable
-fun ProfileScreen() {
-    val context = LocalContext.current
+fun ProfileScreen(
+    authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(LocalContext.current.applicationContext as Application))
+) {
+    val userProfile by authViewModel.userProfile.collectAsState()
+    val loading by authViewModel.loading.collectAsState()
+    val errorMessage by authViewModel.errorMessage.collectAsState()
 
-    var name by remember { mutableStateOf("John Doe") }
-    var weight by remember { mutableStateOf("70") }
-    var goal by remember { mutableStateOf("Build Muscle") }
+    var name by remember { mutableStateOf(userProfile.name) }
+    var weight by remember { mutableStateOf(userProfile.weight) }
+    var goal by remember { mutableStateOf(userProfile.goal) }
+    var gender by remember { mutableStateOf(userProfile.gender) }
+    var age by remember { mutableStateOf(userProfile.age) }
+    var imageUri by remember { mutableStateOf<Uri?>(if (userProfile.imageUri != null) Uri.parse(userProfile.imageUri) else null) }
 
     val genderOptions = listOf("Male", "Female", "Other")
     val ageOptions = (12..100).map { it.toString() }
 
     var genderExpanded by remember { mutableStateOf(false) }
-    var gender by remember { mutableStateOf("Male") }
-
     var ageExpanded by remember { mutableStateOf(false) }
-    var age by remember { mutableStateOf("35") }
 
     // Image Picker
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
     }
 
-    Scaffold(
-//        bottomBar = {
-//            NavigationBar(containerColor = Color.Black) {
-//                NavigationBarItem(
-//                    selected = false,
-//                    onClick = { /* TODO */ },
-//                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
-//                    label = { Text("Home", color = Color.White) },
-//                    alwaysShowLabel = true
-//                )
-//                NavigationBarItem(
-//                    selected = false,
-//                    onClick = { /* TODO */ },
-//                    icon = { Icon(Icons.Default.DirectionsWalk, contentDescription = "Workout", tint = Color.White) },
-//                    label = { Text("Workout", color = Color.White) },
-//                    alwaysShowLabel = true
-//                )
-//                NavigationBarItem(
-//                    selected = false,
-//                    onClick = { /* TODO */ },
-//                    icon = { Icon(Icons.Default.Coffee, contentDescription = "Diet", tint = Color.White) },
-//                    label = { Text("Diet", color = Color.White) },
-//                    alwaysShowLabel = true
-//                )
-//                NavigationBarItem(
-//                    selected = true,
-//                    onClick = { /* current */ },
-//                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
-//                    label = { Text("Profile", color = Color.White) },
-//                    alwaysShowLabel = true
-//                )
-//            }
-//        }
-    ) { padding ->
+    // Update local state when userProfile changes
+    LaunchedEffect(userProfile) {
+        name = userProfile.name
+        weight = userProfile.weight
+        goal = userProfile.goal
+        gender = userProfile.gender
+        age = userProfile.age
+        imageUri = if (userProfile.imageUri != null) Uri.parse(userProfile.imageUri) else null
+    }
+
+    Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -207,22 +183,28 @@ fun ProfileScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Button(
                 onClick = {
-                    // TODO: Save info
+                    authViewModel.updateProfile(
+                        name = name,
+                        weight = weight,
+                        goal = goal,
+                        gender = gender,
+                        age = age,
+                        imageUri = imageUri,
+                        onSuccess = { /* Handle success if needed */ }
+                    )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !loading
             ) {
                 Text("Save")
             }
+
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(errorMessage ?: "", color = MaterialTheme.colorScheme.error)
+            }
         }
     }
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewProfileScreen() {
-    ProfileScreen()
 }

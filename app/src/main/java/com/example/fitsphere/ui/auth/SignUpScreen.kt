@@ -19,8 +19,8 @@ import androidx.lifecycle.ViewModelProvider
 
 @Composable
 fun SignUpScreen(
-    onSuccess: () -> Unit = {},
-    onSwitchToLogin: () -> Unit = {},
+    onSignUpSuccess: () -> Unit = {},
+    onGoToLogin: () -> Unit = {},
     viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(LocalContext.current.applicationContext as Application))
 ) {
     var name by remember { mutableStateOf("") }
@@ -71,7 +71,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = { viewModel.signUp(name, email, password, onSuccess) },
+            onClick = { viewModel.signUp(name, email, password, onSignUpSuccess) },
             modifier = Modifier.fillMaxWidth(),
             enabled = !loading
         ) {
@@ -88,7 +88,7 @@ fun SignUpScreen(
         Text(
             text = "Already have an account? Log in",
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable { onSwitchToLogin() },
+            modifier = Modifier.clickable { onGoToLogin() },
             textAlign = TextAlign.Center
         )
     }

@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import com.google.firebase.auth.GoogleAuthProvider
 
+// Data class representing user profile data
 data class UserProfile(
     val name: String = "",
     val email: String = "",
@@ -27,32 +29,83 @@ data class UserProfile(
 )
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
+
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
+    // Loading state flow
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
+    // Error message state flow
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    // Current user's email state flow
     private val _currentUserEmail = MutableStateFlow(auth.currentUser?.email)
     val currentUserEmail: StateFlow<String?> = _currentUserEmail
 
+    // User profile state flow
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile
 
     init {
-        // Fetch user profile when ViewModel is initialized
+        // Fetch user profile on ViewModel initialization
         fetchUserProfile()
     }
 
+    // Method to check if a user is logged in
+    fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
+    }
+
+    // Login using Google ID token
+    fun loginWithGoogle(idToken: String, onSuccess: () -> Unit) {
+        _loading.value = true
+        _errorMessage.value = null
+
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = auth.signInWithCredential(credential).await()
+                val user = result.user
+
+                if (user != null) {
+                    val userMap = mapOf(
+                        "name" to (user.displayName ?: ""),
+                        "email" to (user.email ?: ""),
+                        "weight" to "70",
+                        "goal" to "Build Muscle",
+                        "gender" to "Male",
+                        "age" to "35",
+                        "imageUri" to (user.photoUrl?.toString() ?: "")
+                    )
+                    firestore.collection("Users").document(user.email!!).set(userMap).await()
+                }
+
+                withContext(Dispatchers.Main) {
+                    _loading.value = false
+                    _currentUserEmail.value = user?.email
+                    fetchUserProfile()
+                    Toast.makeText(getApplication(), "Google Sign-In Successful", Toast.LENGTH_SHORT).show()
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _loading.value = false
+                    _errorMessage.value = e.message ?: "Google Sign-In Failed"
+                    Toast.makeText(getApplication(), "Google Sign-In Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // Fetch user profile from Firebase Auth and Firestore
     fun fetchUserProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val googleUser = auth.currentUser
                 if (googleUser != null) {
-                    // Google Sign-In or authenticated user
                     withContext(Dispatchers.Main) {
                         _userProfile.value = UserProfile(
                             name = googleUser.displayName.orEmpty(),
@@ -61,7 +114,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         _currentUserEmail.value = googleUser.email
                     }
-                    // Fetch additional data from Firestore for authenticated user
                     val document = firestore.collection("Users").document(googleUser.email.orEmpty()).get().await()
                     withContext(Dispatchers.Main) {
                         if (document.exists()) {
@@ -77,7 +129,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
                 } else {
-                    // No authenticated user, fetch from 'currentUser' document
                     val document = firestore.collection("Users").document("currentUser").get().await()
                     withContext(Dispatchers.Main) {
                         if (document.exists()) {
@@ -96,16 +147,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _errorMessage.value = e.message ?: "Failed to fetch profile"
-                    Toast.makeText(
-                        getApplication(),
-                        "Failed to fetch profile: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Failed to fetch profile: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    // Update user profile and save to Firestore
     fun updateProfile(
         name: String,
         weight: String,
@@ -121,16 +169,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val documentId = if (auth.currentUser != null) {
-                    // Use email for authenticated users
                     auth.currentUser?.email ?: throw Exception("No user email")
                 } else {
-                    // Use 'currentUser' for unauthenticated users
                     "currentUser"
                 }
 
                 val newUserData = mapOf(
                     "name" to name,
-                    "email" to (if (auth.currentUser != null) auth.currentUser?.email.orEmpty() else ""),
+                    "email" to (auth.currentUser?.email ?: ""),
                     "weight" to weight,
                     "goal" to goal,
                     "gender" to gender,
@@ -143,34 +189,27 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     _loading.value = false
                     _userProfile.value = UserProfile(
                         name = name,
-                        email = if (auth.currentUser != null) auth.currentUser?.email.orEmpty() else "",
+                        email = auth.currentUser?.email ?: "",
                         weight = weight,
                         goal = goal,
                         gender = gender,
                         age = age,
                         imageUri = imageUri?.toString()
                     )
-                    Toast.makeText(
-                        getApplication(),
-                        "Save Successful",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Save Successful", Toast.LENGTH_SHORT).show()
                     onSuccess()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _loading.value = false
                     _errorMessage.value = e.message ?: "Save Error"
-                    Toast.makeText(
-                        getApplication(),
-                        "Save Error: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Save Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    // Register new user with email and password
     fun signUp(name: String, email: String, password: String, onSuccess: () -> Unit) {
         _loading.value = true
         _errorMessage.value = null
@@ -199,27 +238,20 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         gender = "Male",
                         age = "35"
                     )
-                    Toast.makeText(
-                        getApplication(),
-                        "Registration Successful",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Registration Successful", Toast.LENGTH_SHORT).show()
                     onSuccess()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _loading.value = false
                     _errorMessage.value = e.message ?: "Registration Failed"
-                    Toast.makeText(
-                        getApplication(),
-                        "Registration Failed: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Registration Failed: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    // Login existing user with email and password
     fun login(email: String, password: String, onSuccess: () -> Unit) {
         _loading.value = true
         _errorMessage.value = null
@@ -230,30 +262,22 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     _loading.value = false
                     _currentUserEmail.value = authResult.user?.email
-                    fetchUserProfile() // Fetch profile data after login
-                    Toast.makeText(
-                        getApplication(),
-                        "Login Successful",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    fetchUserProfile()
+                    Toast.makeText(getApplication(), "Login Successful", Toast.LENGTH_SHORT).show()
                     onSuccess()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _loading.value = false
                     _errorMessage.value = e.message ?: "Login Failed"
-                    Toast.makeText(
-                        getApplication(),
-                        "Login Failed: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(getApplication(), "Login Failed: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 }
 
-
+// ViewModel Factory for AuthViewModel
 class AuthViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {

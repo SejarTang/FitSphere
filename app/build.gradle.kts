@@ -10,9 +10,9 @@ plugins {
 android {
     namespace = "com.example.fitsphere"
     compileSdk = 35
-2
+    2
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.example.fitsphere"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -86,24 +86,38 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    // Firebase Auth
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    // Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Google
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
 
     // Google Maps & Location
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
-
-    implementation("org.maplibre.gl:android-sdk:9.5.0@aar")
-    implementation ("org.maplibre.gl:android-plugin-annotation-v9:1.0.0")
-
-
-
+    implementation("org.maplibre.gl:android-sdk:9.5.0")
 
     // Accompanist Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
 
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+
+//    // Firebase
+//    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+//    implementation("com.google.firebase:firebase-auth")
+//    implementation("com.google.firebase:firebase-auth-ktx")
+//    implementation("com.google.firebase:firebase-firestore")
+//    implementation("io.grpc:grpc-okhttp:1.70.0")
+//    implementation("io.grpc:grpc-protobuf-lite:1.70.0")
+//    implementation("io.grpc:grpc-stub:1.70.0")
+//    implementation("io.grpc:grpc-android:1.70.0")
+//    implementation("com.google.android.gms:play-services-auth:21.1.1")
+//    implementation(libs.firebase.auth)
 
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
