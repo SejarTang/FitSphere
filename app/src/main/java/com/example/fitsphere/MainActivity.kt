@@ -17,7 +17,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.example.fitsphere.R
+import android.widget.Toast
+
 
 class MainActivity : ComponentActivity() {
 
@@ -92,20 +93,27 @@ class MainActivity : ComponentActivity() {
     // Handle Google SignIn result
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
+            // Attempt to get the GoogleSignInAccount from the completed task
             val account = completedTask.getResult(ApiException::class.java)!!
             val idToken = account.idToken
+
             if (idToken != null) {
-                // Call ViewModel to perform Google login with token
+                // Call ViewModel method to handle Google login with the ID token
                 authViewModel.loginWithGoogle(idToken) {
-                    // On successful login callback (optional)
-                    // For example: close login screen or navigate elsewhere
+                    // Navigate to HomeActivity
+                    startActivity(Intent(this, HomeActivity::class.java))
+                    finish() // Close login screen so user can't go back to it
                 }
             } else {
-                // Handle missing idToken error
+                // idToken is null
+                Toast.makeText(this, "Google login failed: ID token missing", Toast.LENGTH_LONG).show()
             }
         } catch (e: ApiException) {
-            // Handle sign-in failure (log or notify user)
+            // Google sign-in failed, catch the exception
             e.printStackTrace()
+            // Show error toast to inform user about failure
+            Toast.makeText(this, "Google login failed: ${e.statusCode}", Toast.LENGTH_LONG).show()
         }
     }
+
 }
