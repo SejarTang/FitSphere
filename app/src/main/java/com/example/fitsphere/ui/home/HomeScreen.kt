@@ -9,7 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fitsphere.R
 
@@ -33,7 +34,12 @@ data class GridItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    homeViewModel: HomeViewModel = viewModel()
+) {
+    val tip by homeViewModel.tip.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,30 +57,43 @@ fun HomeScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            SectionWithBackground(
-                title = "Today's Weather",
-                content = "22°C  |  Wind: 12 km/h"
+            // Weather block with clickable navigation
+            WeatherSectionInHomeScreen(
+                viewModel = homeViewModel,
+                navController = navController
             )
 
+            // Tip block
             SectionWithBackground(
                 title = "Fitness Tips",
-                content = "Remember to warm up before your workout and stay hydrated throughout your training."
+                content = tip,
+                onClick = {
+                    navController.navigate("tip/${Uri.encode(tip)}")
+                }
             )
 
             Text("Explore Workouts", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             WorkoutGrid(navController = navController)
+
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
 @Composable
-fun SectionWithBackground(title: String, content: String) {
+fun SectionWithBackground(
+    title: String,
+    content: String,
+    onClick: (() -> Unit)? = null
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF2F2F2))
+            .clickable(enabled = onClick != null) {
+                onClick?.invoke()
+            }
             .padding(16.dp)
     ) {
         Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)

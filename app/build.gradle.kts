@@ -105,6 +105,7 @@ dependencies {
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
     // kapt("com.google.dagger:hilt-compiler:2.48")

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -11,8 +12,7 @@ import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import com.example.fitsphere.ui.BottomBar
 import com.example.fitsphere.ui.auth.LoginScreen
 import com.example.fitsphere.ui.diet.DietScreen
-import com.example.fitsphere.ui.home.HomeScreen
-import com.example.fitsphere.ui.home.WorkoutDetailScreen as VideoWorkoutDetailScreen
+import com.example.fitsphere.ui.home.*
 import com.example.fitsphere.ui.profile.ProfileScreen
 import com.example.fitsphere.ui.workout.*
 
@@ -80,15 +80,35 @@ fun AppNavigation(viewModel: WorkoutViewModel) {
                     navArgument("duration") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-                val args = backStackEntry.arguments!!
+                val title = backStackEntry.arguments?.getString("title") ?: ""
+                val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
+                val description = backStackEntry.arguments?.getString("description") ?: ""
+                val intensity = backStackEntry.arguments?.getString("intensity") ?: ""
+                val duration = backStackEntry.arguments?.getString("duration") ?: ""
+
                 VideoWorkoutDetailScreen(
                     navController = navController,
-                    title = args.getString("title")!!,
-                    videoId = args.getString("videoId")!!,
-                    description = args.getString("description")!!,
-                    intensity = args.getString("intensity")!!,
-                    duration = args.getString("duration")!!
+                    title = title,
+                    videoId = videoId,
+                    description = description,
+                    intensity = intensity,
+                    duration = duration
                 )
+            }
+
+            // Tip screen
+            composable(
+                route = "tip/{tip}",
+                arguments = listOf(navArgument("tip") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val tip = backStackEntry.arguments?.getString("tip")
+                TipScreen(passedTip = tip, navController = navController)
+            }
+
+            // ✅ Weather Detail screen
+            composable("weatherDetail") {
+                val homeViewModel: HomeViewModel = viewModel()
+                WeatherDetailScreen(viewModel = homeViewModel, navController = navController)
             }
 
             // Diet Tab
