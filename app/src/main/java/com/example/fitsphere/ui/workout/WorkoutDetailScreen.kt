@@ -17,8 +17,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.fitsphere.data.local.database.entity.WorkoutEntity
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,17 +35,8 @@ fun WorkoutDetailScreen(
     entry: WorkoutEntity,
     navController: NavController
 ) {
-    val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         .format(Date(entry.startTime))
-
-
-    val durationStars = (entry.duration / 600).toInt()
-    val calorieStars = (entry.calories / 100)
-    val totalStars = (durationStars + calorieStars).coerceIn(1, 5)
-
-
-    val beatenPercent = (50 + totalStars * 10).coerceAtMost(99)
 
     Scaffold(
         topBar = {
@@ -47,7 +46,6 @@ fun WorkoutDetailScreen(
                     IconButton(onClick = {
                         navController.navigate("workout") {
                             popUpTo("workout") { inclusive = true }
-                            launchSingleTop = true
                         }
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -100,18 +98,61 @@ fun WorkoutDetailScreen(
 
             Divider()
 
+            Text("Workout Route", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+            // Mapbox 地图（带模拟折线路线）
+            Box(
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        MapView(context).apply {
+                            getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS) {
+                                val mapboxMap = getMapboxMap()
+                                val center = Point.fromLngLat(144.9631, -37.8136)
+                                mapboxMap.setCamera(
+                                    CameraOptions.Builder()
+                                        .center(center)
+                                        .zoom(14.0)
+                                        .build()
+                                )
+
+                                // 创建 Polyline 路线
+                                val annotationApi = this.annotations
+                                val polylineManager = annotationApi.createPolylineAnnotationManager()
+
+                                val routePoints = listOf(
+                                    Point.fromLngLat(144.9631, -37.8136),
+                                    Point.fromLngLat(144.9645, -37.8145),
+                                    Point.fromLngLat(144.9660, -37.8132),
+                                    Point.fromLngLat(144.9675, -37.8120)
+                                )
+
+                                val polyline = PolylineAnnotationOptions()
+                                    .withPoints(routePoints)
+                                    .withLineColor("#ee4e8b")
+                                    .withLineWidth(5.0)
+                                polylineManager.create(polyline)
+                            }
+                        }
+                    }
+                )
+            }
+
+            Divider()
 
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
-                repeat(totalStars) {
+                repeat(4) {
                     Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
                 }
-                repeat(5 - totalStars) {
-                    Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
-                }
+                Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
             }
 
-            Text("You outperformed $beatenPercent% of users!", fontWeight = FontWeight.Medium)
+            Text("You outperformed 82% of users!", fontWeight = FontWeight.Medium)
             Text("Keep pushing your limits — you're doing great! 💪", fontSize = 14.sp)
         }
     }
