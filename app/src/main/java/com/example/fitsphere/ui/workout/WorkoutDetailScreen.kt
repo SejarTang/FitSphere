@@ -2,7 +2,6 @@
 
 package com.example.fitsphere.ui.workout
 
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,14 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.example.fitsphere.data.local.database.entity.WorkoutEntity
-import org.maplibre.gl.maps.MapView
-import org.maplibre.gl.maps.Style
-import org.maplibre.gl.maps.CameraOptions
-import org.maplibre.gl.maps.plugin.locationcomponent.location
-import org.maplibre.gl.maps.plugin.Plugin
-
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,7 +29,6 @@ fun WorkoutDetailScreen(
     val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         .format(Date(entry.startTime))
-    val routePoints = entry.route.map { LatLng(it.latitude, it.longitude) }
 
     Scaffold(
         topBar = {
@@ -94,48 +85,6 @@ fun WorkoutDetailScreen(
             }
 
             Divider()
-
-            if (routePoints.isNotEmpty()) {
-                AndroidView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    factory = { ctx ->
-                        MapView(ctx).apply {
-                            layoutParams = ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT
-                            )
-                            getMapAsync { mapLibreMap ->
-                                mapLibreMap.setStyle(
-                                    Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")
-                                ) {
-                                    mapLibreMap.moveCamera(
-                                        CameraUpdateFactory.newLatLngZoom(routePoints.first(), 15.0)
-                                    )
-                                    val polyline = PolylineOptions()
-                                        .addAll(routePoints)
-                                        .color(0xFF3F51B5.toInt())
-                                        .width(5f)
-                                    mapLibreMap.addPolyline(polyline)
-                                }
-                            }
-                        }
-                    }
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFE0E0E0)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No route data", color = Color.Gray)
-                }
-            }
 
             Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row {
