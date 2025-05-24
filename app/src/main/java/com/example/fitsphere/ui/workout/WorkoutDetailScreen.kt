@@ -45,7 +45,7 @@ fun WorkoutDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigate("workout") {
-                            popUpTo("workout") { inclusive = true }
+                            popUpTo("start") { inclusive = true }
                         }
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
