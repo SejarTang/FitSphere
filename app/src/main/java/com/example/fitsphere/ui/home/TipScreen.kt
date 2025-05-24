@@ -1,13 +1,14 @@
+// WeatherDetailScreen.kt
 package com.example.fitsphere.ui.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Build
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -15,118 +16,178 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import com.example.fitsphere.util.TipUtil
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-data class FitnessData(
-    val stepsToday: Int = 0,
-    val sleepHours: Int = 0,
-    val waterLitres: Double = 0.0,
-    val workoutMinutes: Int = 0
-)
-
-fun generateTip(data: FitnessData?, mood: String = "positive"): String {
-    return when {
-        data == null -> listOf(
-            "💧 Stay hydrated throughout your day.",
-            "🧘‍♀️ Take 5 minutes to stretch every hour.",
-            "🥗 Eat more greens and whole foods.",
-            "🏃 Move at least 30 minutes a day.",
-            "😴 Aim for 7–8 hours of sleep each night."
-        ).random()
-
-        data.stepsToday < 3000 -> if (mood == "fun") "😅 Your feet miss you! Walk a bit today?" else "🚶 Try walking more to boost your activity."
-        data.sleepHours < 6 -> if (mood == "fun") "🦉 Night owl? Even owls need naps!" else "😴 Try to get more sleep for recovery."
-        data.waterLitres < 1.5 -> if (mood == "fun") "🚰 Your body called — it wants more water." else "💧 Hydration is key to staying healthy."
-        data.workoutMinutes < 20 -> if (mood == "fun") "🏋️ Your muscles are napping — wake them up!" else "🔥 Even a short workout can energize you."
-        else -> "🎉 You're doing awesome! Keep going!"
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipScreen(fitnessData: FitnessData? = null) {
-    val context = LocalContext.current
+fun TipScreen(passedTip: String?, navController: NavController) {
     val clipboardManager = LocalClipboardManager.current
-    var tip by remember { mutableStateOf(generateTip(fitnessData)) }
-    var mood by remember { mutableStateOf("positive") }
+    var tip by remember { mutableStateOf(passedTip ?: TipUtil.generateTip()) }
 
     val greeting = getGreetingMessage()
     val currentTime = remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
-        } else {
-            "Time Unavailable"
-        }
+        } else "Time Unavailable"
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.background)
+    val moodOptions = listOf("positive", "fun", "calm", "focus", "dark")
+    val moodEmojis = mapOf(
+        "positive" to "🌞",
+        "fun" to "😄",
+        "calm" to "🧘",
+        "focus" to "🎯",
+        "dark" to "🌙"
+    )
+    var moodIndex by remember { mutableIntStateOf(0) }
+    val mood = moodOptions[moodIndex]
+    val emoji = moodEmojis[mood] ?: "💡"
+
+    val bgBrush = getMoodGradient(mood)
+    val topBarColor by animateColorAsState(targetValue = getMoodColor(mood), label = "AppBarColor")
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        " ",
+                        color = if (mood == "dark") Color.White else Color.Black
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = if (mood == "dark") Color.White else Color.Black
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor
                 )
             )
-            .padding(24.dp)
-    ) {
+        }
+    ) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(brush = bgBrush)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("$greeting 🌞", fontSize = 22.sp, fontWeight = FontWeight.Medium)
+            // Greeting
+            Text(
+                text = "$emoji $greeting",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Medium
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+
+            // Tip Block
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("💡 Fitness Tip", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(tip, fontSize = 16.sp, lineHeight = 24.sp)
+                Text(
+                    "💡 Daily Fitness Tip",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(6.dp)
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(tip, fontSize = 16.sp, lineHeight = 24.sp)
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+                        var newTip: String
+                        do {
+                            newTip = TipUtil.generateTip()
+                        } while (newTip == tip)
+                        tip = newTip
+                    }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh Tip")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("New Tip")
+                    }
+
+                    Button(onClick = {
+                        clipboardManager.setText(AnnotatedString(tip))
+                    }) {
+                        Icon(Icons.Default.ContentCopy, contentDescription = "Copy Tip")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Copy")
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Button(onClick = {
-                    val newTip = generateTip(fitnessData, mood)
-                    if (newTip != tip) tip = newTip
-                }) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh Tip")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("New Tip")
+            // Mood Selector
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.medium)
+                        .clickable {
+                            moodIndex = (moodIndex + 1) % moodOptions.size
+                        },
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(getMoodColor(mood), shape = MaterialTheme.shapes.small)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "Mood: ${mood.uppercase()} ${emoji}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "(Tap to switch mood)",
+                            fontSize = 13.sp,
+                            color = Color.DarkGray
+                        )
+                    }
                 }
 
-                Button(onClick = {
-                    clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(tip))
-                }) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Copy")
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    "Last updated: $currentTime",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TextButton(onClick = {
-                mood = if (mood == "positive") "fun" else "positive"
-                tip = generateTip(fitnessData, mood)
-            }) {
-                Text("Switch Mood: ${if (mood == "positive") "Fun 😄" else "Positive ✨"}")
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            Text("Last updated: $currentTime", fontSize = 12.sp)
         }
     }
 }
@@ -139,26 +200,27 @@ fun getGreetingMessage(): String {
             now.hour in 12..17 -> "Good Afternoon"
             else -> "Good Evening"
         }
-    } else {
-        "Hello"
+    } else "Hello"
+}
+
+fun getMoodGradient(mood: String): Brush {
+    return when (mood) {
+        "fun" -> Brush.verticalGradient(listOf(Color(0xFFFFCDD2), Color(0xFFFFF8E1)))
+        "positive" -> Brush.verticalGradient(listOf(Color(0xFFB3E5FC), Color.White))
+        "calm" -> Brush.verticalGradient(listOf(Color(0xFFE0F7FA), Color(0xFFF1F8E9)))
+        "focus" -> Brush.verticalGradient(listOf(Color(0xFFE8EAF6), Color(0xFFE3F2FD)))
+        "dark" -> Brush.verticalGradient(listOf(Color(0xFF263238), Color(0xFF37474F)))
+        else -> Brush.verticalGradient(listOf(Color.LightGray, Color.White))
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TipScreenPreview() {
-    TipScreen()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TipScreenWithDataPreview() {
-    TipScreen(
-        fitnessData = FitnessData(
-            stepsToday = 1800,
-            sleepHours = 5,
-            waterLitres = 0.9,
-            workoutMinutes = 8
-        )
-    )
+fun getMoodColor(mood: String): Color {
+    return when (mood) {
+        "fun" -> Color(0xFFFFCDD2)
+        "positive" -> Color(0xFFB3E5FC)
+        "calm" -> Color(0xFFE0F7FA)
+        "focus" -> Color(0xFFE8EAF6)
+        "dark" -> Color(0xFF263238)
+        else -> Color.LightGray
+    }
 }

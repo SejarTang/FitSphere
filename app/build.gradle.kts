@@ -106,6 +106,7 @@ dependencies {
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
 //    // Firebase
 //    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
