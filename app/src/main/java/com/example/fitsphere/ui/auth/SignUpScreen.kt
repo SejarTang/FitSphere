@@ -1,8 +1,12 @@
 package com.example.fitsphere.ui.auth
 
 import android.app.Application
+import android.util.Patterns
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,12 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 
 @Composable
 fun SignUpScreen(
@@ -26,8 +29,8 @@ fun SignUpScreen(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // Observe ViewModel states
     val loading by viewModel.loading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
@@ -64,14 +67,47 @@ fun SignUpScreen(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+                val description = if (passwordVisible) "Hide password" else "Show password"
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(icon, contentDescription = description)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
+        )
+
+
+        Text(
+            text = "Password must be at least 6 characters, contain a letter and a number, and must not include special characters.",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = { viewModel.signUp(name, email, password, onSignUpSuccess) },
+            onClick = {
+                val passwordValid = password.length >= 6 &&
+                        password.any { it.isLetter() } &&
+                        password.any { it.isDigit() } &&
+                        password.all { it.isLetterOrDigit() }
+
+                when {
+                    name.isBlank() -> viewModel.setErrorMessage("Name cannot be empty")
+                    email.isBlank() -> viewModel.setErrorMessage("Email cannot be empty")
+                    !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                        viewModel.setErrorMessage("Invalid email format")
+                    !passwordValid ->
+                        viewModel.setErrorMessage("Password must be at least 6 characters, contain a letter and a number, and must not include special characters")
+                    else -> {
+                        viewModel.setErrorMessage(null)
+                        viewModel.signUp(name, email, password, onSignUpSuccess)
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = !loading
         ) {

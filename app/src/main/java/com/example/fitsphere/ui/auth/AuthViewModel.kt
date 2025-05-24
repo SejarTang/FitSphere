@@ -17,6 +17,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.google.firebase.auth.GoogleAuthProvider
 
+
 // Data class representing user profile data
 data class UserProfile(
     val name: String = "",
@@ -49,6 +50,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile
 
+    fun setErrorMessage(message: String?) {
+        _errorMessage.value = message
+    }
     init {
         // Fetch user profile on ViewModel initialization
         fetchUserProfile()

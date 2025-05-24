@@ -108,17 +108,17 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
-//    // Firebase
-//    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-//    implementation("com.google.firebase:firebase-auth")
-//    implementation("com.google.firebase:firebase-auth-ktx")
-//    implementation("com.google.firebase:firebase-firestore")
-//    implementation("io.grpc:grpc-okhttp:1.70.0")
-//    implementation("io.grpc:grpc-protobuf-lite:1.70.0")
-//    implementation("io.grpc:grpc-stub:1.70.0")
-//    implementation("io.grpc:grpc-android:1.70.0")
-//    implementation("com.google.android.gms:play-services-auth:21.1.1")
-//    implementation(libs.firebase.auth)
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("io.grpc:grpc-okhttp:1.70.0")
+    implementation("io.grpc:grpc-protobuf-lite:1.70.0")
+    implementation("io.grpc:grpc-stub:1.70.0")
+    implementation("io.grpc:grpc-android:1.70.0")
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
+    implementation(libs.firebase.auth)
 
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
