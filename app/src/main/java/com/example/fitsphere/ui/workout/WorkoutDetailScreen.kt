@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -111,29 +110,31 @@ fun WorkoutDetailScreen(
                         MapView(context).apply {
                             getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS) {
                                 val mapboxMap = getMapboxMap()
-                                val center = Point.fromLngLat(144.9631, -37.8136)
+
+                                val routePoints = entry.route.map {
+                                    Point.fromLngLat(it.longitude, it.latitude)
+                                }
+
+                                val startPoint = routePoints.firstOrNull()
+                                    ?: Point.fromLngLat(144.9631, -37.8136)
+
                                 mapboxMap.setCamera(
                                     CameraOptions.Builder()
-                                        .center(center)
-                                        .zoom(14.0)
+                                        .center(startPoint)
+                                        .zoom(16.0)
                                         .build()
                                 )
 
                                 val annotationApi = this.annotations
                                 val polylineManager = annotationApi.createPolylineAnnotationManager()
 
-                                val routePoints = listOf(
-                                    Point.fromLngLat(144.9631, -37.8136),
-                                    Point.fromLngLat(144.9645, -37.8145),
-                                    Point.fromLngLat(144.9660, -37.8132),
-                                    Point.fromLngLat(144.9675, -37.8120)
-                                )
-
-                                val polyline = PolylineAnnotationOptions()
-                                    .withPoints(routePoints)
-                                    .withLineColor("#ee4e8b")
-                                    .withLineWidth(5.0)
-                                polylineManager.create(polyline)
+                                if (routePoints.size >= 2) {
+                                    val polyline = PolylineAnnotationOptions()
+                                        .withPoints(routePoints)
+                                        .withLineColor("#ee4e8b")
+                                        .withLineWidth(5.0)
+                                    polylineManager.create(polyline)
+                                }
                             }
                         }
                     }
