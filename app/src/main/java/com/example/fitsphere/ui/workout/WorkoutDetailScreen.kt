@@ -100,7 +100,6 @@ fun WorkoutDetailScreen(
 
             Text("Workout Route", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
-            // Mapbox 地图（带模拟折线路线）
             Box(
                 modifier = Modifier
                     .height(200.dp)
@@ -120,7 +119,6 @@ fun WorkoutDetailScreen(
                                         .build()
                                 )
 
-                                // 创建 Polyline 路线
                                 val annotationApi = this.annotations
                                 val polylineManager = annotationApi.createPolylineAnnotationManager()
 
@@ -142,18 +140,7 @@ fun WorkoutDetailScreen(
                 )
             }
 
-            Divider()
-
-            Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Row {
-                repeat(4) {
-                    Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
-                }
-                Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
-            }
-
-            Text("You outperformed 82% of users!", fontWeight = FontWeight.Medium)
-            Text("Keep pushing your limits — you're doing great! 💪", fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

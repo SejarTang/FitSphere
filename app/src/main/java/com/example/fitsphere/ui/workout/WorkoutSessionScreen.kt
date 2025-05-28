@@ -167,7 +167,7 @@ fun WorkoutSessionScreen(
                     Text("End Workout", fontSize = 18.sp)
                 }
 
-                Spacer(modifier = Modifier.height(16.dp)) // 👈 留一点底部空隙
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

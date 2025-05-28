@@ -29,7 +29,6 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     fun getWorkoutById(id: Int): WorkoutEntity? {
         Log.d("WorkoutViewModel", "Searching workout with id=$id")
 
-        // 先查缓存
         if (latestWorkout?.id == id) {
             Log.d("WorkoutViewModel", "Found in latestWorkout cache")
             return latestWorkout
