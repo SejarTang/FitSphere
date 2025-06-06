@@ -105,7 +105,7 @@ fun SectionWithBackground(
 @Composable
 fun WorkoutGrid(navController: NavController) {
     val items = listOf(
-        GridItem("Cardio", R.drawable.cardio, "ml6cT4AZdqI", "30-minute cardio session", "Medium", "30"),
+            GridItem("Cardio", R.drawable.cardio, "giyrEQEPj94", "30-minute cardio session", "Medium", "30"),
         GridItem("Yoga", R.drawable.yoga, "v7AYKMP6rOE", "Yoga for beginners", "Easy", "20"),
         GridItem("HIIT", R.drawable.hiit, "ml6cT4AZdqI", "Full body HIIT", "Hard", "20"),
         GridItem("Strength", R.drawable.stretching, "UoC_O3HzsH0", "Strength building", "Medium", "30")
