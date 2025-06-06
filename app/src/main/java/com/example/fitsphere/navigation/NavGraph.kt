@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.fitsphere.data.local.database.entity.WorkoutEntity
 import com.example.fitsphere.ui.auth.LoginScreen
 import com.example.fitsphere.ui.auth.SignUpScreen
 import com.example.fitsphere.ui.diet.DietScreen
@@ -12,16 +13,18 @@ import com.example.fitsphere.ui.profile.ProfileScreen
 import com.example.fitsphere.ui.workout.WorkoutHomeScreen
 import com.example.fitsphere.ui.workout.WorkoutViewModel
 import com.example.fitsphere.ui.auth.AuthViewModel
+import com.example.fitsphere.ui.workout.WorkoutDetailScreen
+import com.example.fitsphere.ui.workout.WorkoutSessionScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     workoutViewModel: WorkoutViewModel,
-    authViewModel: AuthViewModel,  // 传入AuthViewModel
+    authViewModel: AuthViewModel,
     onStartWorkout: () -> Unit,
-    onGoogleLoginClicked: () -> Unit // 传入Google登录触发函数
+    onGoogleLoginClicked: () -> Unit
 ) {
-    // 登录状态监听，登录成功后切换界面
+
     val isLoggedIn = remember { mutableStateOf(authViewModel.isUserLoggedIn()) }
 
     NavHost(
@@ -95,6 +98,18 @@ fun NavGraph(
                 ProfileScreen()
             } else {
                 navController.navigate("login")
+            }
+        }
+
+        composable("detail") {
+            val entry = navController.previousBackStackEntry
+                ?.savedStateHandle?.get<WorkoutEntity>("workoutEntry")
+
+            if (entry != null) {
+                WorkoutDetailScreen(
+                    entry = entry,
+                    navController = navController
+                )
             }
         }
     }

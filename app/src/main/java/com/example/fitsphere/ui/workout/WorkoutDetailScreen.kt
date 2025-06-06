@@ -13,20 +13,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import com.example.fitsphere.data.local.database.entity.WorkoutEntity
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun WorkoutDetailScreen(
     entry: WorkoutEntity,
-    onBack: () -> Unit = {}
+    navController: NavController
 ) {
-    val context = LocalContext.current
     val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         .format(Date(entry.startTime))
 
@@ -35,7 +42,11 @@ fun WorkoutDetailScreen(
             TopAppBar(
                 title = { Text("Workout Details", color = Color.Black) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        navController.navigate("workout") {
+                            popUpTo("start") { inclusive = true }
+                        }
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -86,16 +97,51 @@ fun WorkoutDetailScreen(
 
             Divider()
 
-            Text("Performance Rating", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Row {
-                repeat(4) {
-                    Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
-                }
-                Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color(0xFFFFC107))
+            Text("Workout Route", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+            Box(
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        MapView(context).apply {
+                            getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS) {
+                                val mapboxMap = getMapboxMap()
+
+                                val routePoints = entry.route.map {
+                                    Point.fromLngLat(it.longitude, it.latitude)
+                                }
+
+                                val startPoint = routePoints.firstOrNull()
+                                    ?: Point.fromLngLat(144.9631, -37.8136)
+
+                                mapboxMap.setCamera(
+                                    CameraOptions.Builder()
+                                        .center(startPoint)
+                                        .zoom(16.0)
+                                        .build()
+                                )
+
+                                val annotationApi = this.annotations
+                                val polylineManager = annotationApi.createPolylineAnnotationManager()
+
+                                if (routePoints.size >= 2) {
+                                    val polyline = PolylineAnnotationOptions()
+                                        .withPoints(routePoints)
+                                        .withLineColor("#ee4e8b")
+                                        .withLineWidth(5.0)
+                                    polylineManager.create(polyline)
+                                }
+                            }
+                        }
+                    }
+                )
             }
 
-            Text("You outperformed 82% of users!", fontWeight = FontWeight.Medium)
-            Text("Keep pushing your limits — you're doing great! 💪", fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

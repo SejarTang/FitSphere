@@ -64,7 +64,7 @@ fun AppNavigation(viewModel: WorkoutViewModel) {
                 if (entry != null) {
                     WorkoutDetailScreen(
                         entry = entry,
-                        onBack = { navController.popBackStack() }
+                        navController = navController
                     )
                 }
             }

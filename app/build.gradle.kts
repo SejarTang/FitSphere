@@ -98,7 +98,6 @@ dependencies {
     // Google Maps & Location
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("org.maplibre.gl:android-sdk:9.5.0")
 
     // Accompanist Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
@@ -119,6 +118,10 @@ dependencies {
     implementation("io.grpc:grpc-android:1.70.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation(libs.firebase.auth)
+
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:6.12.0")
+    implementation("com.mapbox.maps:android:11.12.2")
+
 
     // Hilt
     // implementation("com.google.dagger:hilt-android:2.48")
